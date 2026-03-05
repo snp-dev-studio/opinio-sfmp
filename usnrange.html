@@ -1,0 +1,420 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Set USN Range — OPINIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --card-bg:rgba(255,255,255,0.93);
+  --teal:#00acc1;--teal2:#00bcd4;
+  --blue:#1a6fa8;--red:#e53935;
+  --text-dark:#0d2a38;--text-mid:#1e4a5e;
+  --text-muted:#7a9aaa;--text-hint:#a0bac8;
+  --input-border:#d8eef5;--input-bg:#f5fbfd;
+  --preview-bg:#eef7ff;--preview-border:#c8dff0;
+  --shadow-card:0 8px 30px rgba(0,80,110,0.13),0 2px 8px rgba(0,80,110,0.07);
+  --radius:18px;--radius-btn:50px;--radius-input:10px;
+}
+html,body{
+  width:100%;min-height:100%;
+  font-family:'DM Sans',sans-serif;
+  background:linear-gradient(160deg,#a8e8f0 0%,#b2ecec 40%,#b8f0ee 70%,#aae8f0 100%);
+  min-height:100vh;overflow-x:hidden;
+}
+/* admin bar */
+.admin-bar{
+  width:100%;background:rgba(255,255,255,0.72);backdrop-filter:blur(12px);
+  padding:10px 16px;font-size:0.85rem;color:#4a6a7a;
+  border-bottom:1px solid rgba(0,180,210,0.15);position:sticky;top:0;z-index:100;
+}
+.admin-bar span{font-weight:700;color:#1a6fa8}
+/* page wrap */
+.page-wrap{max-width:560px;margin:0 auto;padding:20px 14px 70px;display:flex;flex-direction:column;gap:14px}
+/* header card */
+.header-card{
+  background:var(--card-bg);border-radius:var(--radius);padding:20px 20px 16px;
+  text-align:center;box-shadow:var(--shadow-card);border:1.5px solid rgba(255,255,255,0.88);
+  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.page-title{font-family:'Syne',sans-serif;font-size:clamp(1.2rem,5vw,1.5rem);font-weight:800;color:var(--teal);margin-bottom:5px}
+.page-sub{font-size:0.84rem;color:var(--text-muted)}
+/* ranges list */
+.ranges-list{display:flex;flex-direction:column;gap:12px}
+/* single range card */
+.range-card{
+  background:var(--card-bg);border-radius:var(--radius);padding:18px 16px 16px;
+  box-shadow:var(--shadow-card);border:1.5px solid rgba(255,255,255,0.88);
+  display:flex;flex-direction:column;gap:13px;
+  animation:cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+/* range header */
+.range-header{display:flex;align-items:center;justify-content:space-between}
+.range-label{
+  font-family:'Syne',sans-serif;font-size:0.85rem;font-weight:700;color:var(--teal);
+  background:rgba(0,188,212,0.10);border:1px solid rgba(0,188,212,0.22);
+  border-radius:50px;padding:3px 12px;
+}
+.range-del{
+  width:28px;height:28px;border-radius:50%;
+  background:rgba(229,57,53,0.09);border:1px solid rgba(229,57,53,0.18);
+  color:var(--red);font-size:0.82rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:background 0.2s,transform 0.22s;
+}
+.range-del:hover{background:rgba(229,57,53,0.18);transform:scale(1.12)}
+.range-del:active{transform:scale(0.9)}
+/* fields row */
+.fields-row{display:flex;gap:11px;flex-direction:column}
+@media(min-width:400px){.fields-row{flex-direction:row}.fields-row .field-group{flex:1}}
+.field-group{display:flex;flex-direction:column;gap:4px}
+.field-label{font-size:0.8rem;font-weight:700;color:var(--text-dark)}
+.field-input{
+  width:100%;background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:var(--radius-input);padding:11px 12px;
+  font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;color:var(--text-dark);
+  outline:none;text-align:center;letter-spacing:0.4px;
+  transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+}
+.field-input::placeholder{color:var(--text-hint);font-weight:400;letter-spacing:0}
+.field-input:focus{border-color:var(--teal2);background:#fff;box-shadow:0 0 0 3px rgba(0,188,212,0.12)}
+.field-input.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(229,57,53,0.09)}
+.field-hint{font-size:0.68rem;color:var(--text-hint)}
+.field-err{font-size:0.7rem;color:var(--red);display:none;font-weight:500}
+.field-err.show{display:block}
+/* preview */
+.usn-preview{
+  background:var(--preview-bg);border:1.5px solid var(--preview-border);
+  border-radius:10px;padding:10px 13px;display:flex;flex-direction:column;gap:3px;
+}
+.preview-range{font-size:0.82rem;font-weight:700;color:var(--text-dark)}
+.preview-total{font-size:0.72rem;font-weight:600;color:var(--teal)}
+/* add range btn */
+.add-range-wrap{display:flex;flex-direction:column;align-items:center;gap:7px}
+.add-range-btn{
+  width:48px;height:48px;border-radius:50%;
+  background:linear-gradient(135deg,var(--teal2),var(--teal));
+  color:#fff;border:none;font-size:1.6rem;line-height:1;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 4px 16px rgba(0,188,212,0.38);
+  transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease;
+}
+.add-range-btn:hover{transform:scale(1.16) rotate(90deg);box-shadow:0 8px 24px rgba(0,188,212,0.50)}
+.add-range-btn:active{transform:scale(0.93)}
+.add-hint{font-size:0.73rem;color:var(--text-muted);text-align:center}
+/* save all btn */
+.btn-save-all{
+  width:100%;padding:14px;
+  background:linear-gradient(135deg,#1ab8cc,#00acc1,#0097a7);
+  color:#fff;border:none;border-radius:var(--radius-btn);
+  font-family:'DM Sans',sans-serif;font-size:0.95rem;font-weight:700;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  position:relative;overflow:hidden;
+  box-shadow:0 5px 18px rgba(0,172,193,0.35);
+  transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease;
+}
+.btn-save-all::before{
+  content:'';position:absolute;top:0;left:-120%;width:65%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+  transform:skewX(-20deg);transition:left 0.5s ease;
+}
+.btn-save-all:hover::before{left:140%}
+.btn-save-all:hover{transform:translateY(-2px) scale(1.015);box-shadow:0 10px 28px rgba(0,172,193,0.45)}
+.btn-save-all:active{transform:scale(0.97)}
+.btn-save-all:disabled{opacity:0.65;cursor:not-allowed;transform:none}
+/* saved summary */
+.saved-summary{
+  background:var(--card-bg);border-radius:var(--radius);padding:16px 18px;
+  box-shadow:var(--shadow-card);border:1.5px solid rgba(255,255,255,0.88);
+  display:none;flex-direction:column;gap:8px;
+  animation:cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+}
+.saved-summary.show{display:flex}
+.saved-head{font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:700;color:var(--teal)}
+.saved-badge{
+  display:inline-flex;align-items:center;gap:6px;
+  background:rgba(0,188,212,0.09);border:1px solid rgba(0,188,212,0.20);
+  border-radius:50px;padding:5px 12px;font-size:0.73rem;font-weight:600;color:var(--teal);
+}
+.saved-grand{
+  font-size:0.77rem;color:var(--text-muted);font-weight:500;
+  border-top:1px dashed rgba(0,188,212,0.18);padding-top:8px;
+}
+/* back */
+.back-wrap{display:flex;justify-content:center}
+.btn-back{
+  display:inline-flex;align-items:center;gap:8px;padding:12px 28px;
+  background:linear-gradient(135deg,#1a6fa8,#1554a0);color:#fff;
+  border:none;border-radius:var(--radius-btn);
+  font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;cursor:pointer;
+  box-shadow:0 5px 16px rgba(26,111,168,0.30);
+  transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease;
+  position:relative;overflow:hidden;
+}
+.btn-back::before{
+  content:'';position:absolute;top:0;left:-120%;width:65%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.2),transparent);
+  transform:skewX(-20deg);transition:left 0.5s ease;
+}
+.btn-back:hover::before{left:140%}
+.btn-back:hover{transform:translateY(-2px) scale(1.03);box-shadow:0 10px 26px rgba(26,111,168,0.40)}
+.btn-back:active{transform:scale(0.97)}
+/* toast */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);
+  padding:13px 26px;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  z-index:9999;opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;max-width:92vw;text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,0.22);pointer-events:none;background:#1a2a4a;color:#fff;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{background:linear-gradient(135deg,#0d7a46,#0fa356)}
+#toast.error{background:linear-gradient(135deg,#b01a1a,#d42020)}
+@media(min-width:600px){.page-wrap{padding:28px 20px 80px}}
+</style>
+</head>
+<body>
+
+<div class="admin-bar">Admin: <span id="adminBarId">—</span></div>
+
+<div class="page-wrap">
+
+  <!-- Header -->
+  <div class="header-card">
+    <div class="page-title">Set USN Range or Limit</div>
+    <div class="page-sub" id="deptSemLabel">— · Semester —</div>
+  </div>
+
+  <!-- Range cards injected here -->
+  <div class="ranges-list" id="rangesList"></div>
+
+  <!-- + button -->
+  <div class="add-range-wrap">
+    <button class="add-range-btn" onclick="addRangeCard()" title="Add another range">+</button>
+    <div class="add-hint">Tap + to add another USN range</div>
+  </div>
+
+  <!-- Save All -->
+  <button class="btn-save-all" id="saveAllBtn" onclick="saveAllRanges()">
+    📋 Save All Ranges
+  </button>
+
+  <!-- Saved summary -->
+  <div class="saved-summary" id="savedSummary">
+    <div class="saved-head">✅ Currently Saved Ranges:</div>
+    <div id="savedBadges" style="display:flex;flex-direction:column;gap:6px"></div>
+    <div class="saved-grand" id="savedGrand"></div>
+  </div>
+
+  <!-- Back -->
+  <div class="back-wrap">
+    <button class="btn-back" onclick="window.location.href='adminpanel.html'">← Back to Admin Panel</button>
+  </div>
+
+</div>
+
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp }   from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyA_mhiq57BO4DH7TIDtlzw3-kUfzRLm0k0",
+  authDomain:"opinio-e813a.firebaseapp.com",
+  projectId:"opinio-e813a",
+  storageBucket:"opinio-e813a.firebasestorage.app",
+  messagingSenderId:"553281150769",
+  appId:"1:553281150769:web:f7f154a9a4d23588c25a10"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+const loginId  = sessionStorage.getItem('opinio_loginId')  || '';
+const dept     = sessionStorage.getItem('opinio_dept')     || '';
+const sem      = sessionStorage.getItem('opinio_sem')      || '';
+const deptName = sessionStorage.getItem('opinio_deptName') || dept;
+
+document.getElementById('adminBarId').textContent   = loginId || '—';
+document.getElementById('deptSemLabel').textContent = `${deptName} · Semester ${sem}`;
+
+const pad = n => String(n).padStart(3,'0');
+let counter = 0;
+
+function usnRef(){
+  return doc(db,`departments/${dept}/semesters/${sem}/accounts/${loginId}/usnRange/ranges`);
+}
+
+/* ════════════════════════════
+   ADD RANGE CARD
+════════════════════════════ */
+window.addRangeCard = function(sv='', ev=''){
+  counter++;
+  const id   = `rc_${counter}`;
+  const list = document.getElementById('rangesList');
+  const card = document.createElement('div');
+  card.className = 'range-card';
+  card.id = id;
+  card.innerHTML = `
+    <div class="range-header">
+      <span class="range-label" id="${id}_lbl">Range ${document.querySelectorAll('.range-card').length+1}</span>
+      <button class="range-del" onclick="removeCard('${id}')">✕</button>
+    </div>
+    <div class="fields-row">
+      <div class="field-group">
+        <label class="field-label">Starting USN (Last 3 digits):</label>
+        <input class="field-input" id="${id}_s" type="number" min="1" max="999"
+               placeholder="e.g. 001" value="${sv}" oninput="livePreview('${id}')"/>
+        <div class="field-hint">First USN — last 3 digits</div>
+        <div class="field-err" id="${id}_se"></div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Ending USN (Last 3 digits):</label>
+        <input class="field-input" id="${id}_e" type="number" min="1" max="999"
+               placeholder="e.g. 060" value="${ev}" oninput="livePreview('${id}')"/>
+        <div class="field-hint">Last USN — last 3 digits</div>
+        <div class="field-err" id="${id}_ee"></div>
+      </div>
+    </div>
+    <div class="usn-preview">
+      <div class="preview-range" id="${id}_pr">USN Range: —</div>
+      <div class="preview-total" id="${id}_pt">Total USNs: —</div>
+    </div>`;
+  list.appendChild(card);
+  renumber();
+  if(sv||ev) livePreview(id);
+  else setTimeout(()=>document.getElementById(`${id}_s`)?.focus(),80);
+  setTimeout(()=>card.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+};
+
+/* ════════════════════════════
+   REMOVE CARD
+════════════════════════════ */
+window.removeCard = function(id){
+  const all = document.querySelectorAll('.range-card');
+  if(all.length<=1){showToast('⚠️ At least one range required','error');return;}
+  const el = document.getElementById(id);
+  if(!el) return;
+  el.style.transition='opacity 0.25s,transform 0.25s';
+  el.style.opacity='0';el.style.transform='translateX(14px)';
+  setTimeout(()=>{el.remove();renumber();},240);
+};
+
+function renumber(){
+  document.querySelectorAll('.range-card').forEach((c,i)=>{
+    const lbl=document.getElementById(`${c.id}_lbl`);
+    if(lbl) lbl.textContent=`Range ${i+1}`;
+  });
+}
+
+/* ════════════════════════════
+   LIVE PREVIEW
+════════════════════════════ */
+window.livePreview = function(id){
+  const s=parseInt(document.getElementById(`${id}_s`)?.value)||0;
+  const e=parseInt(document.getElementById(`${id}_e`)?.value)||0;
+  const pr=document.getElementById(`${id}_pr`);
+  const pt=document.getElementById(`${id}_pt`);
+  // clear errors
+  [`${id}_s`,`${id}_e`].forEach(i=>document.getElementById(i)?.classList.remove('err'));
+  [`${id}_se`,`${id}_ee`].forEach(i=>document.getElementById(i)?.classList.remove('show'));
+
+  if(s>0&&e>0&&e>=s){
+    pr.textContent=`USN Range: ***XXX${pad(s)} to ***XXX${pad(e)}`;
+    pt.textContent=`Total USNs: ${e-s+1}`;
+  } else if(s>0&&e>0&&e<s){
+    pr.textContent=`⚠️ Ending must be ≥ Starting`;
+    pt.textContent=`Total USNs: —`;
+  } else if(s>0){
+    pr.textContent=`USN Range: ***XXX${pad(s)} to ***XXX???`;
+    pt.textContent=`Total USNs: —`;
+  } else {
+    pr.textContent=`USN Range: —`;
+    pt.textContent=`Total USNs: —`;
+  }
+};
+
+/* ════════════════════════════
+   SAVE ALL
+════════════════════════════ */
+window.saveAllRanges = async function(){
+  const cards=document.querySelectorAll('.range-card');
+  const ranges=[];
+  let ok=true;
+  cards.forEach(card=>{
+    const id=card.id;
+    const s=parseInt(document.getElementById(`${id}_s`)?.value);
+    const e=parseInt(document.getElementById(`${id}_e`)?.value);
+    const si=document.getElementById(`${id}_s`);
+    const ei=document.getElementById(`${id}_e`);
+    const se=document.getElementById(`${id}_se`);
+    const ee=document.getElementById(`${id}_ee`);
+    let row=true;
+    if(!s||s<1||s>999){si.classList.add('err');se.textContent='Enter valid start (1–999)';se.classList.add('show');row=false;ok=false;}
+    if(!e||e<1||e>999){ei.classList.add('err');ee.textContent='Enter valid end (1–999)';ee.classList.add('show');row=false;ok=false;}
+    else if(e<s){ei.classList.add('err');ee.textContent='End must be ≥ Start';ee.classList.add('show');row=false;ok=false;}
+    if(row) ranges.push({startUSN:s,endUSN:e,total:e-s+1});
+  });
+  if(!ok){showToast('⚠️ Fix errors before saving','error');return;}
+
+  const btn=document.getElementById('saveAllBtn');
+  btn.disabled=true;btn.textContent='Saving...';
+  try{
+    await setDoc(usnRef(),{ranges,count:ranges.length,updatedAt:new Date().toISOString()});
+    renderSummary(ranges);
+    showToast(`✅ ${ranges.length} range(s) saved!`,'success');
+  }catch(err){showToast('❌ '+err.message,'error');}
+  btn.disabled=false;btn.innerHTML='📋 Save All Ranges';
+};
+
+/* ════════════════════════════
+   RENDER SAVED SUMMARY
+════════════════════════════ */
+function renderSummary(ranges){
+  const wrap=document.getElementById('savedSummary');
+  document.getElementById('savedBadges').innerHTML=
+    ranges.map((r,i)=>`<div class="saved-badge">Range ${i+1}: ***XXX${pad(r.startUSN)} → ***XXX${pad(r.endUSN)} &nbsp;(${r.total} USNs)</div>`).join('');
+  const grand=ranges.reduce((a,r)=>a+r.total,0);
+  document.getElementById('savedGrand').textContent=
+    `Grand Total: ${grand} USNs across ${ranges.length} range(s)`;
+  wrap.classList.add('show');
+}
+
+/* ════════════════════════════
+   LOAD FROM FIRESTORE
+════════════════════════════ */
+async function load(){
+  try{
+    const snap=await getDoc(usnRef());
+    if(snap.exists()){
+      const d=snap.data();
+      const saved=d.ranges||[];
+      if(saved.length){
+        saved.forEach(r=>addRangeCard(r.startUSN,r.endUSN));
+        renderSummary(saved);
+        return;
+      }
+    }
+  }catch(e){console.warn(e.message);}
+  addRangeCard(); // default empty card
+}
+
+/* ════════════════════════════
+   TOAST
+════════════════════════════ */
+window.showToast=function(msg,type='',dur=4000){
+  const t=document.getElementById('toast');
+  t.textContent=msg;t.className='show'+(type?' '+type:'');
+  clearTimeout(t._t);
+  t._t=setTimeout(()=>{t.classList.remove('show');setTimeout(()=>{t.className='';},400);},dur);
+};
+
+load();
+</script>
+</body>
+</html>

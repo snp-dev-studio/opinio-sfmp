@@ -1,0 +1,710 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Admin Login — OPINIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-from:#b2e8f0;
+  --bg-to:#c8f0ee;
+  --white:#ffffff;
+  --card-bg:#f4f9fb;
+  --text-dark:#1a1f36;
+  --text-mid:#2d4a5e;
+  --text-light:#8899aa;
+  --blue-main:#1a6fa8;
+  --blue-dark:#1554a0;
+  --teal:#00acc1;
+  --red:#e53935;
+  --input-bg:#ffffff;
+  --input-border:#dde8f0;
+  --radius:24px;
+  --radius-btn:50px;
+  --radius-input:12px;
+}
+html,body{
+  width:100%;min-height:100%;
+  font-family:'DM Sans',sans-serif;
+  background:linear-gradient(160deg,#a8e8f0 0%,#b8eeee 40%,#c0f0ec 70%,#b0eaf0 100%);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* animated bg blobs — same as role page */
+.bg-blob{
+  position:fixed;border-radius:50%;filter:blur(70px);
+  opacity:0.22;animation:blobDrift ease-in-out infinite alternate;
+  pointer-events:none;z-index:0;
+}
+.bb1{width:300px;height:300px;background:#00bcd4;top:-60px;left:-60px;animation-duration:10s}
+.bb2{width:220px;height:220px;background:#00e5ff;bottom:10%;right:-40px;animation-duration:13s;animation-delay:2s}
+.bb3{width:160px;height:160px;background:#80deea;bottom:5%;left:20%;animation-duration:16s;animation-delay:1s}
+@keyframes blobDrift{
+  0%{transform:translate(0,0) scale(1)}
+  100%{transform:translate(16px,24px) scale(1.1)}
+}
+
+/* ═══════════════════════════════════════════════
+   PAGE LAYOUT
+═══════════════════════════════════════════════ */
+.page-wrap{
+  position:relative;z-index:1;
+  min-height:100vh;
+  display:flex;align-items:center;justify-content:center;
+  padding:28px 16px 40px;
+}
+
+/* ═══════════════════════════════════════════════
+   MAIN CARD
+═══════════════════════════════════════════════ */
+.admin-card{
+  width:100%;max-width:420px;
+  background:rgba(244,249,251,0.93);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1.5px solid rgba(255,255,255,0.82);
+  border-radius:var(--radius);
+  padding:32px 26px 28px;
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.95) inset,
+    0 24px 72px rgba(0,80,110,0.16),
+    0 4px 18px rgba(0,80,110,0.10);
+  animation:cardIn 0.75s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(44px) scale(0.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ── lock icon circle ── */
+.lock-circle{
+  width:72px;height:72px;border-radius:50%;
+  background:linear-gradient(135deg,#dbeeff,#c8e4f8);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 20px;
+  box-shadow:0 4px 16px rgba(26,111,168,0.15),0 1px 4px rgba(26,111,168,0.10);
+  animation:lockBob 3s ease-in-out infinite;
+  font-size:1.75rem;
+}
+@keyframes lockBob{
+  0%,100%{transform:translateY(0) scale(1)}
+  50%{transform:translateY(-5px) scale(1.05)}
+}
+
+/* ── heading ── */
+.admin-heading{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.55rem,6vw,1.95rem);
+  font-weight:800;
+  color:#1a6fa8;
+  text-align:center;
+  letter-spacing:-0.5px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.head-emoji{font-size:1.4rem;display:inline-block}
+
+.admin-sub{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;
+  font-weight:400;
+  color:var(--text-light);
+  text-align:center;
+  margin-bottom:24px;
+  line-height:1.5;
+  max-width:280px;
+  margin-left:auto;
+  margin-right:auto;
+}
+
+/* ── FIELD ── */
+.field-group{margin-bottom:20px}
+.field-label{
+  display:block;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.9rem;
+  font-weight:700;
+  color:var(--text-dark);
+  margin-bottom:8px;
+}
+.input-wrap{position:relative;display:flex;align-items:center}
+.field-input{
+  width:100%;
+  background:var(--input-bg);
+  border:1.5px solid var(--input-border);
+  border-radius:var(--radius-input);
+  padding:13px 44px 13px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.92rem;
+  color:var(--text-dark);
+  outline:none;
+  transition:border-color 0.22s ease,box-shadow 0.22s ease;
+}
+.field-input::placeholder{color:#b8c8d8;font-weight:400}
+.field-input:focus{
+  border-color:var(--blue-main);
+  box-shadow:0 0 0 3px rgba(26,111,168,0.12);
+}
+.field-input.err{
+  border-color:var(--red);
+  box-shadow:0 0 0 3px rgba(229,57,53,0.10);
+}
+.eye-btn{
+  position:absolute;right:13px;
+  background:none;border:none;cursor:pointer;
+  color:#b0bec5;font-size:1rem;padding:4px;
+  display:flex;align-items:center;
+  transition:color 0.2s;line-height:1;
+}
+.eye-btn:hover{color:#6b7a99}
+
+.field-error{
+  font-size:0.75rem;color:var(--red);
+  margin-top:5px;display:none;font-weight:500;
+}
+.field-error.show{display:block}
+
+/* ═══════════════════════════════════════════════
+   BUTTONS
+═══════════════════════════════════════════════ */
+.btn-stack{
+  display:flex;flex-direction:column;gap:12px;
+  margin-top:4px;
+}
+
+/* shared btn base */
+.btn{
+  width:100%;padding:14px;
+  border:none;border-radius:var(--radius-btn);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.96rem;font-weight:700;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:9px;
+  position:relative;overflow:hidden;
+  transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease;
+  letter-spacing:0.1px;
+}
+.btn::before{
+  content:'';position:absolute;
+  top:0;left:-120%;width:65%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+  transform:skewX(-20deg);
+  transition:left 0.5s ease;
+}
+.btn:hover::before{left:140%}
+.btn:hover{transform:translateY(-2px) scale(1.015)}
+.btn:active{transform:scale(0.98)}
+
+/* Admin Login — teal gradient */
+.btn-login{
+  background:linear-gradient(135deg,#1ab8cc 0%,#00acc1 50%,#0097b2 100%);
+  color:#fff;
+  box-shadow:0 6px 22px rgba(0,150,180,0.36),0 2px 7px rgba(0,150,180,0.22);
+  font-size:1rem;
+}
+.btn-login:hover{
+  box-shadow:0 12px 34px rgba(0,150,180,0.46),0 3px 10px rgba(0,150,180,0.26);
+}
+
+/* Change Admin Password — blue */
+.btn-change{
+  background:linear-gradient(135deg,#1a6fa8,#1554a0);
+  color:#fff;
+  box-shadow:0 6px 20px rgba(26,84,160,0.32),0 2px 7px rgba(26,84,160,0.20);
+}
+.btn-change:hover{
+  box-shadow:0 12px 30px rgba(26,84,160,0.42);
+}
+
+/* Back — blue (same shade as change) */
+.btn-back{
+  background:linear-gradient(135deg,#1a6fa8,#1554a0);
+  color:#fff;
+  box-shadow:0 6px 20px rgba(26,84,160,0.28),0 2px 7px rgba(26,84,160,0.18);
+}
+.btn-back:hover{
+  box-shadow:0 12px 30px rgba(26,84,160,0.38);
+}
+
+/* Sign Out — red */
+.btn-signout{
+  background:linear-gradient(135deg,#e53935,#c62828);
+  color:#fff;
+  box-shadow:0 6px 20px rgba(229,57,53,0.32),0 2px 7px rgba(229,57,53,0.20);
+}
+.btn-signout:hover{
+  box-shadow:0 12px 30px rgba(229,57,53,0.42);
+}
+
+/* ═══════════════════════════════════════════════
+   CHANGE PASSWORD MODAL
+═══════════════════════════════════════════════ */
+.modal-backdrop{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.5);
+  z-index:1000;
+  display:none;align-items:flex-end;justify-content:center;
+  padding:0;
+}
+.modal-backdrop.show{display:flex;animation:backdropIn 0.25s ease}
+@keyframes backdropIn{from{opacity:0}to{opacity:1}}
+
+.modal-sheet{
+  width:100%;max-width:480px;
+  background:#fff;
+  border-radius:24px 24px 0 0;
+  padding:24px 24px 36px;
+  box-shadow:0 -8px 40px rgba(0,0,0,0.18);
+  animation:sheetUp 0.38s cubic-bezier(0.22,1,0.36,1) both;
+  max-height:92vh;
+  overflow-y:auto;
+}
+@keyframes sheetUp{
+  from{transform:translateY(100%)}
+  to{transform:translateY(0)}
+}
+
+/* on desktop — centred modal */
+@media(min-width:520px){
+  .modal-backdrop{align-items:center;padding:20px}
+  .modal-sheet{border-radius:20px;max-width:440px}
+}
+
+.modal-header{
+  display:flex;align-items:center;
+  justify-content:space-between;
+  margin-bottom:22px;
+}
+.modal-title{
+  font-family:'Syne',sans-serif;
+  font-size:1.1rem;font-weight:800;
+  color:var(--text-dark);
+}
+.modal-close{
+  background:none;border:none;cursor:pointer;
+  font-size:1.3rem;color:var(--text-light);
+  padding:4px;border-radius:6px;
+  transition:color 0.2s,background 0.2s;
+  line-height:1;
+}
+.modal-close:hover{color:var(--text-dark);background:#f0f0f0}
+
+/* modal fields */
+.modal-field{margin-bottom:16px}
+.modal-label{
+  display:block;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.86rem;font-weight:700;
+  color:var(--text-dark);margin-bottom:6px;
+}
+.modal-input-wrap{position:relative;display:flex;align-items:center}
+.modal-input{
+  width:100%;
+  border:1.5px solid #dde8f0;
+  border-radius:10px;
+  padding:12px 42px 12px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.9rem;color:var(--text-dark);
+  outline:none;background:#fff;
+  transition:border-color 0.2s,box-shadow 0.2s;
+}
+.modal-input::placeholder{color:#b8c8d8}
+.modal-input:focus{
+  border-color:var(--blue-main);
+  box-shadow:0 0 0 3px rgba(26,111,168,0.10);
+}
+.modal-input.err{border-color:var(--red)}
+.modal-err{
+  font-size:0.74rem;color:var(--red);
+  margin-top:4px;display:none;font-weight:500;
+}
+.modal-err.show{display:block}
+
+/* modal buttons */
+.modal-btns{display:flex;flex-direction:column;gap:10px;margin-top:6px}
+.modal-save{
+  width:100%;padding:13px;
+  background:linear-gradient(135deg,#1a6fa8,#1554a0);
+  color:#fff;border:none;border-radius:50px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.95rem;font-weight:700;
+  cursor:pointer;
+  box-shadow:0 6px 20px rgba(26,84,160,0.30);
+  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s;
+}
+.modal-save:hover{transform:translateY(-2px);box-shadow:0 10px 28px rgba(26,84,160,0.40)}
+.modal-save:active{transform:scale(0.98)}
+
+.modal-cancel{
+  width:100%;padding:12px;
+  background:#fff;
+  border:1.5px solid #dde8f0;
+  border-radius:50px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.92rem;font-weight:600;
+  color:var(--text-mid);cursor:pointer;
+  transition:background 0.2s,transform 0.22s;
+}
+.modal-cancel:hover{background:#f5f8fa;transform:translateY(-1px)}
+
+/* ── login ID bar ── */
+.loginid-bar{
+  position:fixed;top:14px;right:16px;
+  background:rgba(255,255,255,0.85);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(0,180,210,0.18);
+  border-radius:50px;padding:6px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.75rem;font-weight:600;color:#0a6a7e;
+  z-index:200;
+  box-shadow:0 2px 10px rgba(0,100,120,0.12);
+  display:none;
+}
+.loginid-bar.show{display:block}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  padding:13px 26px;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  z-index:99999;opacity:0;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;max-width:92vw;text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,0.22);pointer-events:none;
+  background:#1a2a4a;color:#fff;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{background:linear-gradient(135deg,#0d7a46,#0fa356)}
+#toast.error{background:linear-gradient(135deg,#b01a1a,#d42020)}
+#toast.info{background:linear-gradient(135deg,#0a6a7e,#00acc1)}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:380px){
+  .admin-card{padding:24px 16px 22px}
+  .lock-circle{width:60px;height:60px;font-size:1.5rem}
+}
+@media(min-width:600px){
+  .admin-card{padding:40px 38px 32px}
+}
+</style>
+</head>
+<body>
+
+<!-- bg blobs -->
+<div class="bg-blob bb1"></div>
+<div class="bg-blob bb2"></div>
+<div class="bg-blob bb3"></div>
+
+<!-- Login ID bar -->
+<div class="loginid-bar" id="loginIdBar"></div>
+
+<div class="page-wrap">
+  <div class="admin-card">
+
+    <!-- Lock icon -->
+    <div class="lock-circle">🔒</div>
+
+    <!-- Heading -->
+    <h1 class="admin-heading">
+      Admin Login <span class="head-emoji">🔐</span>
+    </h1>
+    <p class="admin-sub">Access admin panel by entering admin password</p>
+
+    <!-- Admin Password field -->
+    <div class="field-group">
+      <label class="field-label" for="adminPwdInput">Admin Password</label>
+      <div class="input-wrap">
+        <input class="field-input" id="adminPwdInput" type="password"
+               placeholder="Enter admin password" autocomplete="current-password"/>
+        <button class="eye-btn" onclick="toggleEye('adminPwdInput','eyeIcon')" tabindex="-1">
+          <span id="eyeIcon">👁️</span>
+        </button>
+      </div>
+      <div class="field-error" id="pwdErr">Incorrect admin password. Please try again.</div>
+    </div>
+
+    <!-- Buttons -->
+    <div class="btn-stack">
+
+      <!-- Admin Login -->
+      <button class="btn btn-login" onclick="doAdminLogin()">
+        🔑 Admin Login
+      </button>
+
+      <!-- Change Admin Password -->
+      <button class="btn btn-change" onclick="openChangeModal()">
+        Change Admin Password
+      </button>
+
+      <!-- Back -->
+      <button class="btn btn-back" onclick="goBack()">
+        ← Back
+      </button>
+
+      <!-- Sign Out -->
+      <button class="btn btn-signout" onclick="doSignOut()">
+        ↪ Sign Out
+      </button>
+
+    </div>
+
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     CHANGE PASSWORD MODAL
+═══════════════════════════════════════════ -->
+<div class="modal-backdrop" id="changeModal" onclick="handleBackdropClick(event)">
+  <div class="modal-sheet" id="modalSheet">
+
+    <div class="modal-header">
+      <div class="modal-title">Change Admin Password</div>
+      <button class="modal-close" onclick="closeChangeModal()">✕</button>
+    </div>
+
+    <!-- Old Password -->
+    <div class="modal-field">
+      <label class="modal-label">Old Admin Password:</label>
+      <div class="modal-input-wrap">
+        <input class="modal-input" id="oldPwd" type="password"
+               placeholder="Enter old password"/>
+        <button class="eye-btn" onclick="toggleEye('oldPwd','eye_old')" tabindex="-1">
+          <span id="eye_old">👁️</span>
+        </button>
+      </div>
+      <div class="modal-err" id="oldPwdErr">Incorrect old password</div>
+    </div>
+
+    <!-- New Password -->
+    <div class="modal-field">
+      <label class="modal-label">New Admin Password:</label>
+      <div class="modal-input-wrap">
+        <input class="modal-input" id="newPwd" type="password"
+               placeholder="Enter new password (min 4 chars)"/>
+        <button class="eye-btn" onclick="toggleEye('newPwd','eye_new')" tabindex="-1">
+          <span id="eye_new">👁️</span>
+        </button>
+      </div>
+      <div class="modal-err" id="newPwdErr">Password must be at least 4 characters</div>
+    </div>
+
+    <!-- Confirm Password -->
+    <div class="modal-field">
+      <label class="modal-label">Confirm New Password:</label>
+      <div class="modal-input-wrap">
+        <input class="modal-input" id="confirmPwd" type="password"
+               placeholder="Confirm new password"/>
+        <button class="eye-btn" onclick="toggleEye('confirmPwd','eye_conf')" tabindex="-1">
+          <span id="eye_conf">👁️</span>
+        </button>
+      </div>
+      <div class="modal-err" id="confirmPwdErr">Passwords do not match</div>
+    </div>
+
+    <!-- Modal Buttons -->
+    <div class="modal-btns">
+      <button class="modal-save" onclick="saveNewPassword()">Save New Password</button>
+      <button class="modal-cancel" onclick="closeChangeModal()">Cancel</button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, updateDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyA_mhiq57BO4DH7TIDtlzw3-kUfzRLm0k0",
+  authDomain:"opinio-e813a.firebaseapp.com",
+  projectId:"opinio-e813a",
+  storageBucket:"opinio-e813a.firebasestorage.app",
+  messagingSenderId:"553281150769",
+  appId:"1:553281150769:web:f7f154a9a4d23588c25a10"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* ── session ── */
+const loginId = sessionStorage.getItem('opinio_loginId') || '';
+const dept    = sessionStorage.getItem('opinio_dept')    || '';
+const sem     = sessionStorage.getItem('opinio_sem')     || '';
+let   adminPwd= sessionStorage.getItem('opinio_adminPwd')|| '';
+
+/* show loginId bar */
+const bar = document.getElementById('loginIdBar');
+if(loginId){ bar.textContent = '👤 ' + loginId; bar.classList.add('show'); }
+
+/* get account doc ref */
+function accRef(){
+  return doc(db, `departments/${dept}/semesters/${sem}/accounts/${loginId}`);
+}
+
+/* ════════════════════════════════════════════
+   ADMIN LOGIN
+════════════════════════════════════════════ */
+window.doAdminLogin = async function(){
+  const entered = document.getElementById('adminPwdInput').value;
+  const errEl   = document.getElementById('pwdErr');
+  const inp     = document.getElementById('adminPwdInput');
+  errEl.classList.remove('show'); inp.classList.remove('err');
+
+  if(!entered){
+    errEl.textContent = 'Please enter admin password';
+    errEl.classList.add('show'); inp.classList.add('err'); return;
+  }
+
+  try {
+    /* fetch latest admin password from Firestore */
+    const snap = await getDoc(accRef());
+    if(snap.exists()){
+      const stored = snap.data().adminPassword;
+      if(entered !== stored){
+        errEl.textContent = 'Incorrect admin password. Please try again.';
+        errEl.classList.add('show'); inp.classList.add('err');
+        showToast('❌ Incorrect admin password', 'error'); return;
+      }
+      /* correct — update session and go to admin panel */
+      sessionStorage.setItem('opinio_adminPwd', stored);
+      adminPwd = stored;
+      showToast('✅ Admin access granted!', 'success');
+      setTimeout(() => window.location.href = 'adminpanel.html', 1000);
+    }
+  } catch(e){
+    showToast('❌ Error: ' + e.message, 'error');
+  }
+};
+
+/* ════════════════════════════════════════════
+   CHANGE PASSWORD MODAL
+════════════════════════════════════════════ */
+window.openChangeModal = function(){
+  clearModalErrors();
+  ['oldPwd','newPwd','confirmPwd'].forEach(id => {
+    document.getElementById(id).value = '';
+  });
+  document.getElementById('changeModal').classList.add('show');
+};
+window.closeChangeModal = function(){
+  document.getElementById('changeModal').classList.remove('show');
+};
+window.handleBackdropClick = function(e){
+  if(e.target === document.getElementById('changeModal')) closeChangeModal();
+};
+
+window.saveNewPassword = async function(){
+  clearModalErrors();
+  const oldVal  = document.getElementById('oldPwd').value;
+  const newVal  = document.getElementById('newPwd').value;
+  const confVal = document.getElementById('confirmPwd').value;
+  let valid = true;
+
+  if(!oldVal){
+    showModalErr('oldPwdErr','Please enter old password');
+    document.getElementById('oldPwd').classList.add('err'); valid=false;
+  }
+  if(newVal.length < 4){
+    showModalErr('newPwdErr','New password must be at least 4 characters');
+    document.getElementById('newPwd').classList.add('err'); valid=false;
+  }
+  if(newVal !== confVal){
+    showModalErr('confirmPwdErr','Passwords do not match');
+    document.getElementById('confirmPwd').classList.add('err'); valid=false;
+  }
+  if(!valid) return;
+
+  try {
+    const snap = await getDoc(accRef());
+    if(snap.exists()){
+      const stored = snap.data().adminPassword;
+      if(oldVal !== stored){
+        showModalErr('oldPwdErr','Incorrect old admin password');
+        document.getElementById('oldPwd').classList.add('err');
+        showToast('❌ Old password incorrect', 'error'); return;
+      }
+      await updateDoc(accRef(), { adminPassword: newVal });
+      sessionStorage.setItem('opinio_adminPwd', newVal);
+      adminPwd = newVal;
+      closeChangeModal();
+      showToast('✅ Admin password updated!', 'success');
+    }
+  } catch(e){
+    showToast('❌ Error: ' + e.message, 'error');
+  }
+};
+
+/* ════════════════════════════════════════════
+   EYE TOGGLE
+════════════════════════════════════════════ */
+window.toggleEye = function(inputId, eyeId){
+  const inp = document.getElementById(inputId);
+  const eye = document.getElementById(eyeId);
+  if(inp.type === 'password'){ inp.type='text'; eye.textContent='🙈'; }
+  else { inp.type='password'; eye.textContent='👁️'; }
+};
+
+/* ════════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════════ */
+window.goBack = function(){
+  window.location.href = 'role.html';
+};
+window.doSignOut = function(){
+  sessionStorage.clear();
+  showToast('Signed out successfully', 'info');
+  setTimeout(() => window.location.href = 'auth.html', 1000);
+};
+
+/* ════════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════════ */
+function showModalErr(id, msg){
+  const el = document.getElementById(id);
+  if(el){ el.textContent = msg; el.classList.add('show'); }
+}
+function clearModalErrors(){
+  document.querySelectorAll('.modal-err').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.modal-input').forEach(e => e.classList.remove('err'));
+}
+
+/* Enter key support */
+document.getElementById('adminPwdInput').addEventListener('keydown', e => {
+  if(e.key === 'Enter') window.doAdminLogin();
+});
+
+/* ════════════════════════════════════════════
+   TOAST — 4 seconds
+════════════════════════════════════════════ */
+window.showToast = function(msg, type='', duration=4000){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show' + (type ? ' '+type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.className=''; }, 400);
+  }, duration);
+};
+</script>
+</body>
+</html>

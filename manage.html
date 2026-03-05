@@ -1,0 +1,512 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Manage Fields — OPINIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:linear-gradient(160deg,#a8e8f0 0%,#b2ecec 40%,#b8f0ee 70%,#aae8f0 100%);
+  --white:#ffffff;
+  --card-bg:rgba(255,255,255,0.93);
+  --teal:#00acc1;
+  --teal2:#00bcd4;
+  --blue:#1a6fa8;
+  --text-dark:#0d2a38;
+  --text-mid:#1e4a5e;
+  --text-muted:#8899aa;
+  --text-placeholder:#b8cdd8;
+  --input-border:#e8f2f8;
+  --input-focus:#00bcd4;
+  --radius:18px;
+  --radius-btn:50px;
+  --shadow:0 4px 20px rgba(0,80,110,0.11),0 1px 4px rgba(0,80,110,0.06);
+  --shadow-card:0 8px 30px rgba(0,80,110,0.13),0 2px 8px rgba(0,80,110,0.07);
+}
+html,body{
+  width:100%;min-height:100%;
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* ═══════════════════════════════════════
+   PAGE WRAP
+═══════════════════════════════════════ */
+.page-wrap{
+  max-width:680px;
+  margin:0 auto;
+  padding:18px 14px 70px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* ═══════════════════════════════════════
+   PAGE HEADER CARD
+═══════════════════════════════════════ */
+.header-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:20px 20px 16px;
+  box-shadow:var(--shadow-card);
+  border:1.5px solid rgba(255,255,255,0.85);
+  text-align:center;
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(22px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.page-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.15rem,4.5vw,1.4rem);
+  font-weight:800;
+  color:var(--teal);
+  margin-bottom:5px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+}
+.page-sub{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;
+  font-weight:600;
+  color:var(--text-mid);
+  margin-bottom:4px;
+}
+.page-note{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.74rem;
+  color:var(--text-muted);
+  line-height:1.4;
+}
+
+/* ═══════════════════════════════════════
+   SECTION CARD (Subjects / Faculty / Rating)
+═══════════════════════════════════════ */
+.section-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:18px 18px 14px;
+  box-shadow:var(--shadow-card);
+  border:1.5px solid rgba(255,255,255,0.85);
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+.section-card:nth-child(2){animation-delay:0.06s}
+.section-card:nth-child(3){animation-delay:0.12s}
+.section-card:nth-child(4){animation-delay:0.18s}
+
+/* card header row */
+.section-header{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  margin-bottom:4px;
+}
+.section-title{
+  font-family:'Syne',sans-serif;
+  font-size:1rem;
+  font-weight:800;
+  color:var(--teal);
+}
+.section-hint{
+  font-size:0.73rem;
+  color:var(--text-muted);
+  margin-bottom:12px;
+  font-style:italic;
+}
+
+/* add (+) button */
+.add-btn{
+  width:32px;height:32px;
+  border-radius:50%;
+  background:var(--teal2);
+  color:#fff;
+  border:none;
+  font-size:1.2rem;
+  line-height:1;
+  cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  box-shadow:0 3px 10px rgba(0,188,212,0.32);
+  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s;
+  flex-shrink:0;
+}
+.add-btn:hover{transform:scale(1.14) rotate(90deg);box-shadow:0 5px 16px rgba(0,188,212,0.44)}
+.add-btn:active{transform:scale(0.95)}
+
+/* ── field rows ── */
+.fields-list{
+  display:flex;
+  flex-direction:column;
+  gap:0;
+}
+.field-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  border-bottom:1px solid var(--input-border);
+  padding:2px 0;
+  transition:background 0.15s;
+}
+.field-row:last-child{border-bottom:none}
+.field-row:hover{background:rgba(0,188,212,0.03);border-radius:8px}
+
+.field-input{
+  flex:1;
+  background:transparent;
+  border:none;
+  outline:none;
+  padding:11px 8px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;
+  font-weight:500;
+  color:var(--text-dark);
+  transition:color 0.15s;
+  min-width:0;
+}
+.field-input::placeholder{
+  color:var(--text-placeholder);
+  font-weight:400;
+}
+.field-input:focus{color:var(--teal)}
+
+/* remove row button */
+.remove-btn{
+  background:none;border:none;
+  width:26px;height:26px;
+  border-radius:50%;
+  cursor:pointer;
+  color:#cc3333;
+  font-size:1rem;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0;
+  transition:opacity 0.2s,background 0.2s,transform 0.2s;
+  flex-shrink:0;
+}
+.field-row:hover .remove-btn{opacity:1}
+.remove-btn:hover{background:rgba(204,51,51,0.10);transform:scale(1.15)}
+.remove-btn:active{transform:scale(0.9)}
+
+/* ═══════════════════════════════════════
+   BOTTOM NOTE + ACTION BUTTONS
+═══════════════════════════════════════ */
+.bottom-note{
+  font-size:0.75rem;
+  color:var(--text-muted);
+  text-align:center;
+  line-height:1.5;
+  padding:0 8px;
+}
+.action-row{
+  display:flex;
+  gap:12px;
+  justify-content:center;
+  flex-wrap:wrap;
+}
+.btn{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  padding:12px 24px;
+  border:none;
+  border-radius:var(--radius-btn);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.9rem;
+  font-weight:700;
+  cursor:pointer;
+  position:relative;overflow:hidden;
+  transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease;
+  letter-spacing:0.1px;
+}
+.btn::before{
+  content:'';position:absolute;top:0;left:-120%;
+  width:65%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+  transform:skewX(-20deg);transition:left 0.5s ease;
+}
+.btn:hover::before{left:140%}
+.btn:hover{transform:translateY(-2px) scale(1.02)}
+.btn:active{transform:scale(0.97)}
+
+.btn-save{
+  background:linear-gradient(135deg,#00acc1,#0097a7);
+  color:#fff;
+  box-shadow:0 5px 18px rgba(0,172,193,0.34);
+}
+.btn-save:hover{box-shadow:0 10px 28px rgba(0,172,193,0.44)}
+
+.btn-back{
+  background:linear-gradient(135deg,#1a6fa8,#1554a0);
+  color:#fff;
+  box-shadow:0 5px 18px rgba(26,111,168,0.30);
+}
+.btn-back:hover{box-shadow:0 10px 28px rgba(26,111,168,0.40)}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  padding:13px 26px;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  z-index:9999;opacity:0;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;max-width:92vw;text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,0.22);pointer-events:none;
+  background:#1a2a4a;color:#fff;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{background:linear-gradient(135deg,#0d7a46,#0fa356)}
+#toast.error{background:linear-gradient(135deg,#b01a1a,#d42020)}
+#toast.info{background:linear-gradient(135deg,#0a6a7e,#00acc1)}
+
+/* responsive */
+@media(max-width:380px){
+  .page-wrap{padding:12px 10px 60px}
+  .section-card{padding:14px 12px 10px}
+  .btn{padding:11px 18px;font-size:0.84rem}
+}
+@media(min-width:600px){
+  .page-wrap{padding:24px 20px 80px}
+}
+</style>
+</head>
+<body>
+
+<div class="page-wrap">
+
+  <!-- Page Header -->
+  <div class="header-card">
+    <div class="page-title">📋 Managing Subject, Faculty fields &amp; Rating Parameters</div>
+    <div class="page-sub">Enter Subject and Faculty Names</div>
+    <div class="page-note">(This data will be saved &amp; displayed in subject and faculty fields of feedback form)</div>
+  </div>
+
+  <!-- ── Subject Names ── -->
+  <div class="section-card" id="subjectCard">
+    <div class="section-header">
+      <div class="section-title">Subject Names</div>
+      <button class="add-btn" onclick="addRow('subjectList','Subject')" title="Add subject">+</button>
+    </div>
+    <div class="fields-list" id="subjectList">
+      <!-- rows injected by JS -->
+    </div>
+  </div>
+
+  <!-- ── Faculty Names ── -->
+  <div class="section-card" id="facultyCard">
+    <div class="section-header">
+      <div class="section-title">Faculty Names</div>
+      <button class="add-btn" onclick="addRow('facultyList','Faculty')" title="Add faculty">+</button>
+    </div>
+    <div class="fields-list" id="facultyList">
+      <!-- rows injected by JS -->
+    </div>
+  </div>
+
+  <!-- ── Rating Parameters ── -->
+  <div class="section-card" id="ratingCard">
+    <div class="section-header">
+      <div class="section-title">Rating Parameters</div>
+      <button class="add-btn" onclick="addRow('ratingList','Rating Parameter')" title="Add parameter">+</button>
+    </div>
+    <div class="section-hint">e.g., Subject explanation, Punctuality, Communication skills, etc.</div>
+    <div class="fields-list" id="ratingList">
+      <!-- rows injected by JS -->
+    </div>
+  </div>
+
+  <!-- Bottom note + buttons -->
+  <div class="bottom-note">
+    Fill any number of rows (minimum one for each section). Click 'Save Fields' to set the fields in Feedback Form.
+  </div>
+  <div class="action-row">
+    <button class="btn btn-save" onclick="saveFields()">📋 Save Fields ✓</button>
+    <button class="btn btn-back" onclick="goBack()">← Back to Admin</button>
+  </div>
+
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyA_mhiq57BO4DH7TIDtlzw3-kUfzRLm0k0",
+  authDomain:"opinio-e813a.firebaseapp.com",
+  projectId:"opinio-e813a",
+  storageBucket:"opinio-e813a.firebasestorage.app",
+  messagingSenderId:"553281150769",
+  appId:"1:553281150769:web:f7f154a9a4d23588c25a10"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+const loginId = sessionStorage.getItem('opinio_loginId') || '';
+const dept    = sessionStorage.getItem('opinio_dept')    || '';
+const sem     = sessionStorage.getItem('opinio_sem')     || '';
+
+function sfRef(){
+  return doc(db,`departments/${dept}/semesters/${sem}/accounts/${loginId}/subjectFaculty/fields`);
+}
+
+/* ════════════════════════════════════════
+   BUILD ROWS
+════════════════════════════════════════ */
+function buildRow(listId, value, placeholder, index){
+  const row = document.createElement('div');
+  row.className = 'field-row';
+  row.innerHTML = `
+    <input class="field-input" type="text" value="${escAttr(value)}"
+           placeholder="${placeholder} ${index+1}"
+           data-list="${listId}"/>
+    <button class="remove-btn" onclick="removeRow(this)" title="Remove">✕</button>`;
+  return row;
+}
+
+function initList(listId, values, prefix, defaultCount=8){
+  const list = document.getElementById(listId);
+  list.innerHTML = '';
+  const total = Math.max(values.length, defaultCount);
+  for(let i=0;i<total;i++){
+    list.appendChild(buildRow(listId, values[i]||'', prefix, i));
+  }
+}
+
+/* ════════════════════════════════════════
+   ADD / REMOVE ROW
+════════════════════════════════════════ */
+window.addRow = function(listId, prefix){
+  const list  = document.getElementById(listId);
+  const count = list.querySelectorAll('.field-row').length;
+  list.appendChild(buildRow(listId, '', prefix, count));
+  // scroll to new row
+  list.lastElementChild.querySelector('.field-input').focus();
+};
+
+window.removeRow = function(btn){
+  const row  = btn.closest('.field-row');
+  const list = row.parentElement;
+  if(list.querySelectorAll('.field-row').length <= 1){
+    showToast('⚠️ At least one row required','error'); return;
+  }
+  row.style.transition='opacity 0.25s,transform 0.25s';
+  row.style.opacity='0';row.style.transform='translateX(12px)';
+  setTimeout(()=>row.remove(), 240);
+};
+
+/* ════════════════════════════════════════
+   COLLECT VALUES
+════════════════════════════════════════ */
+function collectList(listId){
+  return [...document.querySelectorAll(`#${listId} .field-input`)]
+    .map(i => i.value.trim())
+    .filter(v => v !== '');
+}
+
+/* ════════════════════════════════════════
+   LOAD FROM FIRESTORE
+════════════════════════════════════════ */
+async function loadFields(){
+  try {
+    const snap = await getDoc(sfRef());
+    if(snap.exists()){
+      const d = snap.data();
+      initList('subjectList', d.subjects||[], 'Subject');
+      initList('facultyList', d.faculties||[], 'Faculty');
+      initList('ratingList',  d.ratings||[], 'Rating Parameter', 6);
+    } else {
+      // default empty rows
+      initList('subjectList', [], 'Subject');
+      initList('facultyList', [], 'Faculty');
+      initList('ratingList',  [], 'Rating Parameter', 6);
+    }
+  } catch(e){
+    showToast('❌ Error loading: '+e.message,'error');
+    initList('subjectList', [], 'Subject');
+    initList('facultyList', [], 'Faculty');
+    initList('ratingList',  [], 'Rating Parameter', 6);
+  }
+}
+
+/* ════════════════════════════════════════
+   SAVE TO FIRESTORE
+════════════════════════════════════════ */
+window.saveFields = async function(){
+  const subjects  = collectList('subjectList');
+  const faculties = collectList('facultyList');
+  const ratings   = collectList('ratingList');
+
+  if(!subjects.length){
+    showToast('⚠️ Add at least one Subject','error'); return;
+  }
+  if(!faculties.length){
+    showToast('⚠️ Add at least one Faculty','error'); return;
+  }
+  if(!ratings.length){
+    showToast('⚠️ Add at least one Rating Parameter','error'); return;
+  }
+
+  try {
+    await setDoc(sfRef(), {
+      subjects,
+      faculties,
+      ratings,
+      updatedAt: new Date().toISOString()
+    });
+    showToast('✅ Fields saved successfully!','success');
+  } catch(e){
+    showToast('❌ Error saving: '+e.message,'error');
+  }
+};
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+window.goBack = function(){
+  window.location.href = 'adminpanel.html';
+};
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function escAttr(s){
+  return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* ════════════════════════════════════════
+   TOAST — 4 seconds
+════════════════════════════════════════ */
+window.showToast = function(msg, type='', duration=4000){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show'+(type?' '+type:'');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{
+    t.classList.remove('show');
+    setTimeout(()=>{t.className='';},400);
+  }, duration);
+};
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+loadFields();
+</script>
+</body>
+</html>

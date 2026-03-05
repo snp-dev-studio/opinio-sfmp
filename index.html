@@ -1,0 +1,895 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+<title>OPINIO — Student Feedback Management System</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,300&family=Space+Grotesk:wght@300;400;500;600;700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   ROOT & RESET
+═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --blue-1:#0a4a7c;
+  --blue-2:#1a6fa8;
+  --blue-3:#38b6ff;
+  --blue-4:#b3e5fc;
+  --blue-5:#e0f4ff;
+  --cyan:#00d4ff;
+  --gold:#f0a500;
+  --gold-2:#ffd700;
+  --white:#ffffff;
+  --text-dark:#0d1b2a;
+  --text-mid:#1e3a5f;
+  --text-muted:#4a7fa5;
+  --shadow-card:0 20px 60px rgba(10,60,120,0.15),0 4px 16px rgba(10,60,120,0.08);
+  --shadow-hover:0 32px 80px rgba(10,60,120,0.25),0 8px 24px rgba(10,60,120,0.14);
+  --radius:20px;
+}
+html,body{
+  width:100%;
+  min-height:100%;
+  overflow-x:hidden;
+  font-family:'DM Sans',sans-serif;
+}
+body{background:#d0eaf8}
+
+/* ═══════════════════════════════════════════════
+   PAGE SYSTEM
+═══════════════════════════════════════════════ */
+.page{display:none}
+.page.active{display:block}
+
+/* ═══════════════════════════════════════════════
+   ── LOADING PAGE ──
+═══════════════════════════════════════════════ */
+#page-loading{
+  position:fixed;
+  inset:0;
+  z-index:9999;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  background:linear-gradient(160deg,#f0f9ff 0%,#d0eaf8 25%,#b3dff5 55%,#8ecfed 80%,#6cbde8 100%);
+  transition:opacity 0.65s ease,transform 0.65s ease;
+}
+#page-loading.hiding{
+  opacity:0;
+  transform:scale(1.04);
+  pointer-events:none;
+}
+
+/* — animated water wave bg — */
+.load-waves{position:absolute;inset:0;overflow:hidden}
+.lwave{
+  position:absolute;
+  width:250%;
+  height:250%;
+  top:-75%;
+  left:-75%;
+  border-radius:43%;
+  animation:lwRot linear infinite;
+}
+.lwave1{
+  background:radial-gradient(ellipse at 50% 50%,rgba(56,182,255,0.25) 0%,transparent 65%);
+  animation-duration:14s;
+}
+.lwave2{
+  background:radial-gradient(ellipse at 50% 50%,rgba(0,212,255,0.18) 0%,transparent 60%);
+  animation-duration:20s;
+  animation-direction:reverse;
+  top:-65%;
+}
+.lwave3{
+  background:radial-gradient(ellipse at 50% 50%,rgba(178,224,245,0.22) 0%,transparent 55%);
+  animation-duration:26s;
+  top:-80%;
+}
+@keyframes lwRot{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+
+/* ripple rings */
+.lripple{
+  position:absolute;
+  border-radius:50%;
+  border:1.5px solid rgba(56,182,255,0.28);
+  animation:lRipple 5s ease-out infinite;
+}
+.lr1{width:100px;height:100px;top:18%;left:8%;animation-delay:0s}
+.lr2{width:70px;height:70px;top:72%;right:12%;animation-delay:1.6s}
+.lr3{width:140px;height:140px;bottom:8%;left:28%;animation-delay:3s}
+.lr4{width:55px;height:55px;top:38%;right:6%;animation-delay:0.9s}
+.lr5{width:90px;height:90px;top:8%;right:22%;animation-delay:2.3s}
+.lr6{width:120px;height:120px;top:50%;left:5%;animation-delay:4s}
+@keyframes lRipple{
+  0%{transform:scale(0.4);opacity:0.7}
+  100%{transform:scale(3.5);opacity:0}
+}
+
+/* shimmer particles */
+.lparticle{
+  position:absolute;
+  border-radius:50%;
+  background:radial-gradient(circle,rgba(255,255,255,0.95),rgba(56,182,255,0.35));
+  animation:lFloat ease-in-out infinite alternate;
+}
+.lp1{width:7px;height:7px;top:22%;left:18%;animation-duration:3.2s}
+.lp2{width:5px;height:5px;top:62%;left:72%;animation-duration:4.1s;animation-delay:1.1s}
+.lp3{width:9px;height:9px;top:78%;left:38%;animation-duration:3.7s;animation-delay:0.6s}
+.lp4{width:5px;height:5px;top:12%;right:28%;animation-duration:5.2s;animation-delay:2.1s}
+.lp5{width:4px;height:4px;top:44%;left:6%;animation-duration:4.6s;animation-delay:1.7s}
+.lp6{width:6px;height:6px;bottom:22%;right:18%;animation-duration:3.9s;animation-delay:0.3s}
+@keyframes lFloat{0%{transform:translateY(0) scale(1);opacity:0.5}100%{transform:translateY(-20px) scale(1.4);opacity:1}}
+
+/* loading centre content */
+.load-center{
+  position:relative;
+  z-index:3;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:22px;
+  padding:0 32px;
+  width:100%;
+  max-width:360px;
+}
+
+/* OP logo — loading */
+.load-logo{
+  width:108px;
+  height:108px;
+  border-radius:50%;
+  background:linear-gradient(145deg,#fff 0%,#f0f9ff 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,0.8),
+    0 0 0 8px rgba(56,182,255,0.2),
+    0 0 0 16px rgba(56,182,255,0.08),
+    0 20px 50px rgba(10,60,120,0.22);
+  animation:logoPulse 2.2s ease-in-out infinite alternate;
+}
+.load-logo img{
+  width:78px;
+  height:78px;
+  object-fit:contain;
+  border-radius:50%;
+}
+.load-logo-fallback{
+  font-family:'Syne',sans-serif;
+  font-size:2.2rem;
+  font-weight:900;
+  background:linear-gradient(135deg,#f0a500,#ffd700,#f0a500);
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+}
+@keyframes logoPulse{
+  0%{
+    box-shadow:0 0 0 3px rgba(255,255,255,0.8),0 0 0 8px rgba(56,182,255,0.2),0 0 0 16px rgba(56,182,255,0.08),0 20px 50px rgba(10,60,120,0.22);
+  }
+  100%{
+    box-shadow:0 0 0 4px rgba(255,255,255,0.9),0 0 0 12px rgba(56,182,255,0.3),0 0 0 22px rgba(56,182,255,0.1),0 28px 64px rgba(10,60,120,0.3);
+  }
+}
+
+/* welcome text */
+.load-welcome{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.5rem,5.5vw,1.9rem);
+  font-weight:700;
+  color:var(--text-dark);
+  text-align:center;
+  letter-spacing:-0.3px;
+  line-height:1.2;
+}
+.load-welcome .opinio-word{
+  background:linear-gradient(90deg,#0a5d8a,#1a8fc4,#00b4d8,#1a8fc4,#0a5d8a);
+  background-size:250% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:opinioShine 2.8s linear infinite;
+}
+@keyframes opinioShine{
+  0%{background-position:0% center}
+  100%{background-position:250% center}
+}
+
+/* loading bar */
+.load-bar-outer{
+  width:100%;
+  height:13px;
+  background:rgba(255,255,255,0.5);
+  border-radius:50px;
+  overflow:hidden;
+  border:1.5px solid rgba(255,255,255,0.7);
+  box-shadow:inset 0 2px 5px rgba(10,60,120,0.1),0 2px 8px rgba(255,255,255,0.75);
+}
+.load-bar-fill{
+  height:100%;
+  width:0%;
+  border-radius:50px;
+  background:linear-gradient(90deg,
+    #f0a500 0%,
+    #ff7b2c 12%,
+    #ff3f8a 25%,
+    #c84bef 38%,
+    #5b6ef5 50%,
+    #00b4d8 63%,
+    #00e5a0 76%,
+    #38e8ff 88%,
+    #f0a500 100%
+  );
+  background-size:220% 100%;
+  animation:barFlow 1.8s linear infinite;
+  position:relative;
+  transition:width 80ms linear;
+}
+.load-bar-fill::after{
+  content:'';
+  position:absolute;
+  top:0;right:0;bottom:0;width:50px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.45));
+  border-radius:50px;
+}
+@keyframes barFlow{
+  0%{background-position:0% 50%}
+  100%{background-position:220% 50%}
+}
+
+.load-pct{
+  font-family:'Syne',sans-serif;
+  font-size:1.1rem;
+  font-weight:700;
+  color:#1a6fa8;
+  letter-spacing:1px;
+}
+
+/* ═══════════════════════════════════════════════
+   ── GET STARTED PAGE ──
+═══════════════════════════════════════════════ */
+#page-getstarted{
+  min-height:100vh;
+  position:relative;
+  overflow-x:hidden;
+}
+
+/* animated gradient bg */
+.gs-bg{
+  position:fixed;
+  inset:0;
+  z-index:0;
+  background:linear-gradient(145deg,#e8f6ff 0%,#d0eaf8 30%,#b8dff5 60%,#cce8f7 100%);
+  animation:bgShift 12s ease-in-out infinite alternate;
+}
+@keyframes bgShift{
+  0%{background:linear-gradient(145deg,#e8f6ff 0%,#d0eaf8 30%,#b8dff5 60%,#cce8f7 100%)}
+  100%{background:linear-gradient(165deg,#d6eefc 0%,#c2e3f5 30%,#a8d8f0 60%,#bde2f5 100%)}
+}
+
+/* floating blobs */
+.gs-blob{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(55px);
+  opacity:0.35;
+  animation:blobDrift ease-in-out infinite alternate;
+  z-index:0;
+}
+.gsb1{width:320px;height:320px;background:#38b6ff;top:-80px;left:-80px;animation-duration:9s}
+.gsb2{width:260px;height:260px;background:#00d4ff;top:38%;right:-70px;animation-duration:11s;animation-delay:2s}
+.gsb3{width:180px;height:180px;background:#b3e5fc;bottom:12%;left:15%;animation-duration:13s;animation-delay:1s}
+.gsb4{width:140px;height:140px;background:#38b6ff;bottom:5%;right:10%;animation-duration:15s;animation-delay:3s}
+@keyframes blobDrift{
+  0%{transform:translate(0,0) scale(1)}
+  100%{transform:translate(18px,28px) scale(1.1)}
+}
+
+/* subtle water lines */
+.gs-waterline{
+  position:fixed;
+  left:0;width:100%;height:2px;
+  background:linear-gradient(90deg,transparent,rgba(56,182,255,0.18),rgba(0,212,255,0.25),rgba(56,182,255,0.18),transparent);
+  animation:waterFlow linear infinite alternate;
+  z-index:0;
+  border-radius:50px;
+}
+.gwl1{top:20%;animation-duration:6s}
+.gwl2{top:50%;animation-duration:8s;animation-delay:2s}
+.gwl3{bottom:18%;animation-duration:7s;animation-delay:1s}
+@keyframes waterFlow{
+  0%{transform:scaleX(0.85) translateX(-3%);opacity:0.5}
+  100%{transform:scaleX(1.05) translateX(3%);opacity:1}
+}
+
+/* centre wrapper */
+.gs-wrap{
+  position:relative;
+  z-index:2;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:24px 14px 32px;
+}
+
+/* main glass card */
+.gs-card{
+  width:100%;
+  max-width:430px;
+  background:rgba(255,255,255,0.86);
+  backdrop-filter:blur(28px);
+  -webkit-backdrop-filter:blur(28px);
+  border:1.5px solid rgba(255,255,255,0.78);
+  border-radius:28px;
+  padding:38px 26px 26px;
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.9) inset,
+    0 24px 72px rgba(10,60,120,0.16),
+    0 4px 18px rgba(56,182,255,0.10);
+  animation:gsCardIn 0.9s cubic-bezier(0.22,1,0.36,1) both;
+  animation-delay:0.1s;
+}
+@keyframes gsCardIn{
+  from{opacity:0;transform:translateY(50px) scale(0.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ── logo area ── */
+.gs-logo-area{
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:14px;
+  margin-bottom:18px;
+}
+.gs-logo-ring{
+  width:94px;
+  height:94px;
+  border-radius:50%;
+  background:linear-gradient(145deg,#fff 0%,#f0f9ff 100%);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+  cursor:default;
+  box-shadow:
+    0 0 0 2px rgba(255,255,255,0.9),
+    0 0 0 6px rgba(56,182,255,0.18),
+    0 0 0 12px rgba(56,182,255,0.07),
+    0 14px 36px rgba(10,60,120,0.18);
+  transition:transform 0.35s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.35s ease;
+}
+.gs-logo-ring img{
+  width:68px;
+  height:68px;
+  object-fit:contain;
+  border-radius:50%;
+}
+.gs-logo-ring:hover,.gs-logo-ring:active{
+  transform:scale(1.08) rotate(-4deg);
+  box-shadow:
+    0 0 0 3px rgba(255,255,255,0.95),
+    0 0 0 9px rgba(56,182,255,0.28),
+    0 0 0 18px rgba(56,182,255,0.1),
+    0 20px 48px rgba(10,60,120,0.26);
+}
+
+/* OPINIO animated heading */
+.gs-heading{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(2.4rem,9vw,3rem);
+  font-weight:800;
+  letter-spacing:-1.5px;
+  text-align:center;
+  line-height:1;
+  background:linear-gradient(90deg,#0a5d8a 0%,#1a8fc4 20%,#00b4d8 40%,#38d8f5 55%,#00b4d8 70%,#1a8fc4 85%,#0a5d8a 100%);
+  background-size:220% auto;
+  -webkit-background-clip:text;
+  -webkit-text-fill-color:transparent;
+  background-clip:text;
+  animation:hShine 3.2s linear infinite;
+}
+@keyframes hShine{
+  0%{background-position:0% center}
+  100%{background-position:220% center}
+}
+
+.gs-sub{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(0.92rem,3.5vw,1.05rem);
+  font-weight:600;
+  color:#1a6fa8;
+  text-align:center;
+  letter-spacing:0.1px;
+}
+.gs-tagline{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.86rem;
+  color:#4a7fa5;
+  text-align:center;
+  line-height:1.55;
+  max-width:290px;
+  margin:0 auto;
+}
+
+/* ── feature mini cards ── */
+.gs-feats{
+  display:grid;
+  grid-template-columns:1fr 1fr;
+  gap:11px;
+  margin:20px 0;
+}
+.feat-card{
+  background:rgba(255,255,255,0.92);
+  border:1.5px solid rgba(56,182,255,0.12);
+  border-radius:15px;
+  padding:16px 12px;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  gap:9px;
+  cursor:default;
+  position:relative;
+  overflow:hidden;
+  transition:
+    transform 0.32s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.32s ease;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,1) inset,
+    0 6px 22px rgba(10,60,120,0.09),
+    0 1px 4px rgba(10,60,120,0.06);
+  /* 3D card depth */
+  transform-style:preserve-3d;
+}
+.feat-card::before{
+  content:'';
+  position:absolute;
+  inset:0;
+  border-radius:15px;
+  background:linear-gradient(145deg,rgba(255,255,255,0.65) 0%,rgba(56,182,255,0.04) 100%);
+  pointer-events:none;
+}
+.feat-card::after{
+  content:'';
+  position:absolute;
+  top:0;left:0;right:0;height:1px;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.9),transparent);
+}
+.feat-card:hover{
+  transform:translateY(-7px) scale(1.04) rotateX(2deg);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,1) inset,
+    0 18px 44px rgba(10,60,120,0.18),
+    0 4px 14px rgba(56,182,255,0.16);
+}
+.feat-card:active{
+  transform:translateY(-2px) scale(1.01);
+}
+.feat-ico{
+  width:46px;
+  height:46px;
+  border-radius:12px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:1.55rem;
+}
+.feat-ico.blue{background:linear-gradient(135deg,#dbeeff,#c5e4ff)}
+.feat-ico.purple{background:linear-gradient(135deg,#ede8ff,#ddd0ff)}
+.feat-ico.green{background:linear-gradient(135deg,#d8fff0,#c0f5e2)}
+.feat-ico.orange{background:linear-gradient(135deg,#fff3d8,#ffe6b8)}
+.feat-lbl{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.8rem;
+  font-weight:600;
+  color:#1e3a5f;
+  text-align:center;
+  line-height:1.3;
+}
+
+/* ── reveal animation ── */
+.reveal{
+  opacity:0;
+  transform:translateY(28px);
+  transition:
+    opacity 0.65s cubic-bezier(0.22,1,0.36,1),
+    transform 0.65s cubic-bezier(0.22,1,0.36,1);
+}
+.reveal.visible{opacity:1;transform:translateY(0)}
+.rd1{transition-delay:0.08s}
+.rd2{transition-delay:0.16s}
+.rd3{transition-delay:0.24s}
+.rd4{transition-delay:0.32s}
+.rd5{transition-delay:0.40s}
+.rd6{transition-delay:0.48s}
+
+/* ── Get Started button ── */
+.gs-btn{
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  width:100%;
+  padding:15px 28px;
+  background:linear-gradient(135deg,#1a5fa8 0%,#1a80c4 40%,#00a8d4 100%);
+  color:#fff;
+  border:none;
+  border-radius:50px;
+  font-family:'Syne',sans-serif;
+  font-size:1.02rem;
+  font-weight:700;
+  cursor:pointer;
+  letter-spacing:0.2px;
+  position:relative;
+  overflow:hidden;
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.25) inset,
+    0 8px 28px rgba(10,100,168,0.38),
+    0 2px 8px rgba(10,100,168,0.22);
+  transition:
+    transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.28s ease;
+}
+.gs-btn::before{
+  content:'';
+  position:absolute;
+  top:0;left:-120%;width:80%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.28),transparent);
+  transform:skewX(-20deg);
+  transition:left 0.55s ease;
+}
+.gs-btn:hover::before{left:140%}
+.gs-btn:hover{
+  transform:translateY(-3px) scale(1.02);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.25) inset,
+    0 14px 42px rgba(10,100,168,0.46),
+    0 4px 14px rgba(10,100,168,0.28);
+}
+.gs-btn:active{transform:translateY(0) scale(0.98)}
+.arrow-icon{
+  font-size:1.05rem;
+  display:inline-block;
+  transition:transform 0.28s ease;
+}
+.gs-btn:hover .arrow-icon{transform:translateX(5px)}
+
+/* divider */
+.gs-hr{
+  width:100%;
+  height:1px;
+  background:linear-gradient(90deg,transparent,rgba(56,182,255,0.22),transparent);
+  margin:18px 0 14px;
+}
+
+/* footer */
+.gs-foot{
+  text-align:center;
+}
+.gs-foot p{
+  font-size:0.73rem;
+  color:#7aabca;
+  line-height:1.65;
+}
+.gs-foot strong{
+  color:#4a7fa5;
+  font-weight:600;
+}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+#toast{
+  position:fixed;
+  bottom:26px;
+  left:50%;
+  transform:translateX(-50%) translateY(90px);
+  background:#0d2a4a;
+  color:#fff;
+  padding:12px 24px;
+  border-radius:50px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;
+  font-weight:500;
+  z-index:99999;
+  opacity:0;
+  transition:all 0.38s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;
+  max-width:90vw;
+  text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,0.28);
+  pointer-events:none;
+}
+#toast.show{
+  opacity:1;
+  transform:translateX(-50%) translateY(0);
+}
+#toast.success{background:linear-gradient(135deg,#0a7a4a,#0d9a5a)}
+#toast.error{background:linear-gradient(135deg,#b01a1a,#d42020)}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:380px){
+  .gs-card{padding:28px 16px 22px}
+  .gs-logo-ring{width:80px;height:80px}
+  .gs-logo-ring img{width:58px;height:58px}
+  .feat-card{padding:13px 9px}
+  .feat-ico{width:38px;height:38px;font-size:1.3rem}
+  .feat-lbl{font-size:0.76rem}
+}
+@media(min-width:600px){
+  .gs-card{padding:48px 42px 34px}
+  .gs-logo-ring{width:108px;height:108px}
+  .gs-logo-ring img{width:78px;height:78px}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════════════════
+     PAGE 1 — LOADING
+═══════════════════════════════════════════ -->
+<div id="page-loading" class="page active">
+
+  <!-- animated wave background -->
+  <div class="load-waves">
+    <div class="lwave lwave1"></div>
+    <div class="lwave lwave2"></div>
+    <div class="lwave lwave3"></div>
+    <div class="lripple lr1"></div>
+    <div class="lripple lr2"></div>
+    <div class="lripple lr3"></div>
+    <div class="lripple lr4"></div>
+    <div class="lripple lr5"></div>
+    <div class="lripple lr6"></div>
+    <div class="lparticle lp1"></div>
+    <div class="lparticle lp2"></div>
+    <div class="lparticle lp3"></div>
+    <div class="lparticle lp4"></div>
+    <div class="lparticle lp5"></div>
+    <div class="lparticle lp6"></div>
+  </div>
+
+  <!-- centre content -->
+  <div class="load-center">
+
+    <!-- OP Logo -->
+    <div class="load-logo">
+      <img src="logoop.jpeg" alt="OPINIO"
+        onerror="this.style.display='none';this.parentElement.innerHTML='<span class=\'load-logo-fallback\'>OP</span>'"/>
+    </div>
+
+    <!-- Welcome text -->
+    <div class="load-welcome">
+      Welcome to <span class="opinio-word">OPINIO</span>
+    </div>
+
+    <!-- Loading bar + percent -->
+    <div style="width:100%;display:flex;flex-direction:column;align-items:center;gap:10px">
+      <div class="load-bar-outer">
+        <div class="load-bar-fill" id="loadBar"></div>
+      </div>
+      <div class="load-pct" id="loadPct">0%</div>
+    </div>
+
+  </div>
+</div>
+
+
+<!-- ═══════════════════════════════════════════
+     PAGE 2 — GET STARTED
+═══════════════════════════════════════════ -->
+<div id="page-getstarted" class="page">
+
+  <!-- animated background layers -->
+  <div class="gs-bg"></div>
+  <div class="gs-blob gsb1"></div>
+  <div class="gs-blob gsb2"></div>
+  <div class="gs-blob gsb3"></div>
+  <div class="gs-blob gsb4"></div>
+  <div class="gs-waterline gwl1"></div>
+  <div class="gs-waterline gwl2"></div>
+  <div class="gs-waterline gwl3"></div>
+
+  <!-- main content -->
+  <div class="gs-wrap">
+    <div class="gs-card">
+
+      <!-- Logo + Titles -->
+      <div class="gs-logo-area">
+        <div class="gs-logo-ring reveal rd1">
+          <img src="logoopb.jpeg" alt="OPINIO Logo"
+            onerror="this.style.display='none';this.parentElement.innerHTML='<span style=\'font-family:Syne,sans-serif;font-size:1.7rem;font-weight:900;background:linear-gradient(135deg,#f0a500,#ffd700);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;padding:8px\'>OP</span>'"/>
+        </div>
+
+        <h1 class="gs-heading reveal rd2">OPINIO</h1>
+        <p class="gs-sub reveal rd2">Feedback Management Platform</p>
+        <p class="gs-tagline reveal rd3">Empowering education through student feedback</p>
+      </div>
+
+      <!-- Feature cards -->
+      <div class="gs-feats reveal rd3">
+        <div class="feat-card">
+          <div class="feat-ico blue">🎓</div>
+          <div class="feat-lbl">Easy Feedback Submissions</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico purple">👥</div>
+          <div class="feat-lbl">Subjects &amp; Faculty Management</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico green">📊</div>
+          <div class="feat-lbl">Instant Results, Analytics &amp; Reports</div>
+        </div>
+        <div class="feat-card">
+          <div class="feat-ico orange">⚙️</div>
+          <div class="feat-lbl">Easy Administration &amp; Many more Features</div>
+        </div>
+      </div>
+
+      <!-- Get Started button -->
+      <div class="reveal rd4" style="margin-top:4px">
+        <button class="gs-btn" onclick="goToDepts()">
+          Get Started <span class="arrow-icon">→</span>
+        </button>
+      </div>
+
+      <!-- Divider -->
+      <div class="gs-hr reveal rd5"></div>
+
+      <!-- Footer -->
+      <div class="gs-foot reveal rd6">
+        <p>OPINIO - Student Feedback Management Platform</p>
+        <p><strong>Developed by Syed Numan Pasha</strong></p>
+      </div>
+
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   LOADING BAR — exactly 4 seconds, eased
+════════════════════════════════════════════ */
+(function runLoader(){
+  const bar  = document.getElementById('loadBar');
+  const pct  = document.getElementById('loadPct');
+  const DURATION = 4000;
+  let startTime  = null;
+
+  function easeInOutQuad(t){
+    return t < 0.5 ? 2*t*t : -1+(4-2*t)*t;
+  }
+
+  function tick(now){
+    if(!startTime) startTime = now;
+    const elapsed  = now - startTime;
+    const raw      = Math.min(elapsed / DURATION, 1);
+    const eased    = easeInOutQuad(raw);
+    const value    = Math.round(eased * 100);
+
+    bar.style.width      = value + '%';
+    pct.textContent      = value + '%';
+
+    if(raw < 1){
+      requestAnimationFrame(tick);
+    } else {
+      // done — transition to get started
+      setTimeout(transitionToGetStarted, 180);
+    }
+  }
+  requestAnimationFrame(tick);
+})();
+
+/* ════════════════════════════════════════════
+   TRANSITION: Loading → Get Started
+════════════════════════════════════════════ */
+function transitionToGetStarted(){
+  const lp  = document.getElementById('page-loading');
+  const gsp = document.getElementById('page-getstarted');
+
+  // fade out loading
+  lp.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+  lp.style.opacity    = '0';
+  lp.style.transform  = 'scale(1.04)';
+
+  setTimeout(() => {
+    lp.classList.remove('active');
+    lp.style.display = 'none';
+    gsp.classList.add('active');
+    gsp.style.display = 'block';
+    document.body.style.background = '#d0eaf8';
+
+    // trigger reveal animations shortly after
+    setTimeout(initReveals, 100);
+  }, 620);
+}
+
+/* ════════════════════════════════════════════
+   SCROLL REVEAL — IntersectionObserver
+════════════════════════════════════════════ */
+function initReveals(){
+  const items = document.querySelectorAll('#page-getstarted .reveal');
+  const obs   = new IntersectionObserver((entries) => {
+    entries.forEach(e => {
+      if(e.isIntersecting) e.target.classList.add('visible');
+    });
+  }, { threshold: 0.06 });
+
+  items.forEach(el => {
+    // immediately visible items
+    const rect = el.getBoundingClientRect();
+    if(rect.top < window.innerHeight * 0.98){
+      el.classList.add('visible');
+    } else {
+      obs.observe(el);
+    }
+  });
+}
+
+/* ════════════════════════════════════════════
+   3D TILT — feature cards (desktop/touch)
+════════════════════════════════════════════ */
+function init3DTilt(){
+  document.querySelectorAll('.feat-card').forEach(card => {
+    card.addEventListener('mousemove', e => {
+      const r  = card.getBoundingClientRect();
+      const cx = r.width/2, cy = r.height/2;
+      const dx = e.clientX - r.left - cx;
+      const dy = e.clientY - r.top  - cy;
+      const rx = (dy/cy) * -7;
+      const ry = (dx/cx) *  7;
+      card.style.transform = `translateY(-7px) scale(1.04) rotateX(${rx}deg) rotateY(${ry}deg)`;
+    });
+    card.addEventListener('mouseleave', () => {
+      card.style.transform = '';
+    });
+    card.addEventListener('touchstart', () => {
+      card.style.transform = 'translateY(-5px) scale(1.04)';
+    },{passive:true});
+    card.addEventListener('touchend', () => {
+      card.style.transform = '';
+    },{passive:true});
+  });
+}
+
+/* ════════════════════════════════════════════
+   NAVIGATE → departments.html
+════════════════════════════════════════════ */
+function goToDepts(){
+  // subtle button press feedback
+  showToast('Loading departments...', 1200);
+  setTimeout(() => {
+    window.location.href = 'departments.html';
+  }, 300);
+}
+
+/* ════════════════════════════════════════════
+   TOAST
+════════════════════════════════════════════ */
+function showToast(msg, duration=3500, type=''){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show' + (type ? ' '+type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => { t.classList.remove('show',type); }, duration);
+}
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  init3DTilt();
+});
+</script>
+</body>
+</html>

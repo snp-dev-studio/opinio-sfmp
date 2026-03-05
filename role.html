@@ -1,0 +1,520 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Choose Role — OPINIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-from:#b2e8f0;
+  --bg-to:#c8f0f0;
+  --white:#ffffff;
+  --card-bg:#f5fbfc;
+  --teal-1:#0097a7;
+  --teal-2:#00bcd4;
+  --teal-3:#00e5ff;
+  --text-dark:#0d3d4a;
+  --text-mid:#1a5f6e;
+  --text-light:#6a9aaa;
+  --radius:24px;
+  --radius-role:18px;
+}
+html,body{
+  width:100%;
+  min-height:100%;
+  font-family:'DM Sans',sans-serif;
+  background:linear-gradient(160deg,#a8e8f0 0%,#b8eeee 40%,#c0f0ec 70%,#b0eaf0 100%);
+  min-height:100vh;
+  overflow-x:hidden;
+}
+
+/* animated bg blobs */
+.bg-blob{
+  position:fixed;
+  border-radius:50%;
+  filter:blur(70px);
+  opacity:0.25;
+  animation:blobDrift ease-in-out infinite alternate;
+  pointer-events:none;
+  z-index:0;
+}
+.bb1{width:300px;height:300px;background:#00bcd4;top:-60px;left:-60px;animation-duration:10s}
+.bb2{width:220px;height:220px;background:#00e5ff;bottom:10%;right:-40px;animation-duration:13s;animation-delay:2s}
+.bb3{width:160px;height:160px;background:#80deea;bottom:5%;left:20%;animation-duration:16s;animation-delay:1s}
+@keyframes blobDrift{
+  0%{transform:translate(0,0) scale(1)}
+  100%{transform:translate(16px,24px) scale(1.1)}
+}
+
+/* ═══════════════════════════════════════════════
+   PAGE LAYOUT
+═══════════════════════════════════════════════ */
+.page-wrap{
+  position:relative;
+  z-index:1;
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  padding:28px 16px 40px;
+}
+
+/* ═══════════════════════════════════════════════
+   MAIN CARD
+═══════════════════════════════════════════════ */
+.role-card{
+  width:100%;
+  max-width:420px;
+  background:rgba(245,251,252,0.92);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border:1.5px solid rgba(255,255,255,0.8);
+  border-radius:var(--radius);
+  padding:32px 24px 28px;
+  box-shadow:
+    0 2px 0 rgba(255,255,255,0.95) inset,
+    0 24px 72px rgba(0,100,120,0.16),
+    0 4px 18px rgba(0,100,120,0.10);
+  animation:cardIn 0.75s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(50px) scale(0.95)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+
+/* ── heading ── */
+.role-heading{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.55rem,6vw,2rem);
+  font-weight:800;
+  color:#0a6a7e;
+  text-align:center;
+  letter-spacing:-0.5px;
+  margin-bottom:8px;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  flex-wrap:wrap;
+  animation:headIn 0.8s cubic-bezier(0.22,1,0.36,1) both;
+  animation-delay:0.15s;
+}
+@keyframes headIn{
+  from{opacity:0;transform:translateY(20px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.head-emoji{
+  font-size:1.3rem;
+  animation:emojiSpin 4s ease-in-out infinite;
+  display:inline-block;
+}
+@keyframes emojiSpin{
+  0%,100%{transform:rotate(0deg) scale(1)}
+  25%{transform:rotate(12deg) scale(1.15)}
+  75%{transform:rotate(-8deg) scale(1.08)}
+}
+
+/* ── dept/sem info ── */
+.role-info{
+  font-family:'DM Sans',sans-serif;
+  font-size:clamp(0.78rem,3vw,0.86rem);
+  color:var(--text-light);
+  text-align:center;
+  margin-bottom:26px;
+  line-height:1.5;
+  animation:headIn 0.8s cubic-bezier(0.22,1,0.36,1) both;
+  animation-delay:0.25s;
+}
+
+/* ═══════════════════════════════════════════════
+   ROLE BUTTONS GRID
+   — side by side on desktop, stacked on mobile
+═══════════════════════════════════════════════ */
+.role-grid{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+  margin-bottom:22px;
+}
+@media(min-width:480px){
+  .role-grid{
+    flex-direction:row;
+    gap:16px;
+  }
+}
+
+/* ── individual role card ── */
+.role-btn{
+  flex:1;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:12px;
+  padding:28px 20px 24px;
+  border:none;
+  border-radius:var(--radius-role);
+  cursor:pointer;
+  position:relative;
+  overflow:hidden;
+  font-family:'DM Sans',sans-serif;
+  transition:
+    transform 0.32s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.32s ease;
+  /* reveal start */
+  opacity:0;
+  transform:translateY(28px) scale(0.96);
+}
+.role-btn.visible{
+  opacity:1;
+  transform:translateY(0) scale(1);
+  transition:
+    opacity 0.55s cubic-bezier(0.22,1,0.36,1),
+    transform 0.55s cubic-bezier(0.22,1,0.36,1),
+    box-shadow 0.32s ease;
+}
+.role-btn.visible:hover{
+  transform:translateY(-6px) scale(1.04) !important;
+}
+.role-btn.visible:active{
+  transform:translateY(-1px) scale(1.01) !important;
+}
+
+/* shimmer sweep */
+.role-btn::after{
+  content:'';
+  position:absolute;
+  top:0;left:-120%;
+  width:60%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+  transform:skewX(-18deg);
+  transition:left 0.5s ease;
+  pointer-events:none;
+}
+.role-btn:hover::after{left:140%}
+
+/* Student Login — teal-blue gradient */
+.role-student{
+  background:linear-gradient(145deg,#1ab8cc 0%,#00acc1 50%,#0097b2 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.25) inset,
+    0 8px 28px rgba(0,150,180,0.38),
+    0 2px 8px rgba(0,150,180,0.22);
+}
+.role-student:hover{
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.25) inset,
+    0 16px 44px rgba(0,150,180,0.48),
+    0 4px 14px rgba(0,150,180,0.28);
+}
+
+/* Admin Login — darker teal gradient */
+.role-admin{
+  background:linear-gradient(145deg,#00c4b4 0%,#009688 50%,#00796b 100%);
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.2) inset,
+    0 8px 28px rgba(0,150,136,0.38),
+    0 2px 8px rgba(0,150,136,0.22);
+}
+.role-admin:hover{
+  box-shadow:
+    0 1px 0 rgba(255,255,255,0.2) inset,
+    0 16px 44px rgba(0,150,136,0.48),
+    0 4px 14px rgba(0,150,136,0.28);
+}
+
+/* ── role icon circle ── */
+.role-icon-wrap{
+  width:56px;
+  height:56px;
+  border-radius:50%;
+  border:2px solid rgba(255,255,255,0.35);
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  background:rgba(255,255,255,0.15);
+  transition:transform 0.3s cubic-bezier(0.34,1.56,0.64,1),background 0.3s ease;
+}
+.role-btn:hover .role-icon-wrap{
+  transform:scale(1.12);
+  background:rgba(255,255,255,0.22);
+}
+.role-icon{
+  font-size:1.55rem;
+  color:rgba(255,255,255,0.92);
+}
+
+/* ── role text ── */
+.role-name{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(0.95rem,3.5vw,1.05rem);
+  font-weight:700;
+  color:#fff;
+  text-align:center;
+  line-height:1.2;
+}
+.role-desc{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.78rem;
+  font-weight:400;
+  color:rgba(255,255,255,0.78);
+  text-align:center;
+  margin-top:-6px;
+}
+
+/* ── back to semesters button ── */
+.back-wrap{
+  display:flex;
+  justify-content:center;
+}
+.back-btn{
+  display:inline-flex;
+  align-items:center;
+  gap:8px;
+  padding:12px 28px;
+  background:var(--white);
+  color:var(--text-mid);
+  border:1.5px solid rgba(0,150,180,0.18);
+  border-radius:50px;
+  font-family:'Syne',sans-serif;
+  font-size:0.9rem;
+  font-weight:700;
+  cursor:pointer;
+  box-shadow:0 2px 12px rgba(0,100,120,0.10),0 1px 4px rgba(0,100,120,0.07);
+  transition:
+    transform 0.28s cubic-bezier(0.34,1.56,0.64,1),
+    box-shadow 0.28s ease,
+    background 0.22s ease;
+  letter-spacing:0.1px;
+}
+.back-btn:hover{
+  background:#f0fafb;
+  transform:translateY(-2px) scale(1.03);
+  box-shadow:0 8px 24px rgba(0,100,120,0.16),0 2px 8px rgba(0,100,120,0.10);
+}
+.back-btn:active{transform:scale(0.97)}
+.back-arrow{
+  font-size:0.95rem;
+  transition:transform 0.22s ease;
+}
+.back-btn:hover .back-arrow{transform:translateX(-3px)}
+
+/* ── login ID display (top corner) ── */
+.loginid-bar{
+  position:fixed;
+  top:14px;right:16px;
+  background:rgba(255,255,255,0.82);
+  backdrop-filter:blur(10px);
+  border:1px solid rgba(0,180,210,0.2);
+  border-radius:50px;
+  padding:6px 14px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.76rem;
+  font-weight:600;
+  color:#0a6a7e;
+  z-index:100;
+  box-shadow:0 2px 10px rgba(0,100,120,0.12);
+  display:none;
+}
+.loginid-bar.show{display:block}
+
+/* ═══════════════════════════════════════════════
+   TOAST
+═══════════════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  padding:13px 26px;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  z-index:99999;opacity:0;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;max-width:92vw;text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,0.22);pointer-events:none;
+  background:#1a2a4a;color:#fff;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{background:linear-gradient(135deg,#0d7a46,#0fa356)}
+#toast.error{background:linear-gradient(135deg,#b01a1a,#d42020)}
+#toast.info{background:linear-gradient(135deg,#0a6a7e,#00acc1)}
+
+/* ═══════════════════════════════════════════════
+   RESPONSIVE
+═══════════════════════════════════════════════ */
+@media(max-width:380px){
+  .role-card{padding:26px 16px 22px}
+  .role-btn{padding:22px 14px 18px}
+  .role-icon-wrap{width:48px;height:48px}
+  .role-icon{font-size:1.35rem}
+}
+@media(min-width:600px){
+  .role-card{padding:40px 36px 32px}
+}
+</style>
+</head>
+<body>
+
+<!-- Animated bg blobs -->
+<div class="bg-blob bb1"></div>
+<div class="bg-blob bb2"></div>
+<div class="bg-blob bb3"></div>
+
+<!-- Login ID bar (top right) -->
+<div class="loginid-bar" id="loginIdBar"></div>
+
+<div class="page-wrap">
+  <div class="role-card">
+
+    <!-- Heading -->
+    <h1 class="role-heading">
+      Choose Your Role
+      <span class="head-emoji">🔑</span>
+    </h1>
+
+    <!-- Dept + Sem info -->
+    <p class="role-info" id="roleInfo">
+      Department: — | Semester: —
+    </p>
+
+    <!-- Role Buttons -->
+    <div class="role-grid">
+
+      <!-- Student Login -->
+      <button class="role-btn role-student" id="btnStudent" onclick="goStudent()">
+        <div class="role-icon-wrap">
+          <span class="role-icon">👤</span>
+        </div>
+        <div class="role-name">Student Login</div>
+        <div class="role-desc">Submit your feedback</div>
+      </button>
+
+      <!-- Admin Login -->
+      <button class="role-btn role-admin" id="btnAdmin" onclick="goAdmin()">
+        <div class="role-icon-wrap">
+          <span class="role-icon">🛡️</span>
+        </div>
+        <div class="role-name">Admin Login</div>
+        <div class="role-desc">Manage feedbacks</div>
+      </button>
+
+    </div>
+
+    <!-- Back to Semesters -->
+    <div class="back-wrap">
+      <button class="back-btn" onclick="goBack()">
+        <span class="back-arrow">←</span> Back 
+      </button>
+    </div>
+
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   FILL INFO FROM SESSION
+════════════════════════════════════════════ */
+(function fillInfo(){
+  const loginId  = sessionStorage.getItem('opinio_loginId')  || '';
+  const deptName = sessionStorage.getItem('opinio_deptName') || '—';
+  const sem      = sessionStorage.getItem('opinio_sem')      || '—';
+
+  // show login ID bar if logged in
+  const bar = document.getElementById('loginIdBar');
+  if(loginId){
+    bar.textContent = '👤 ' + loginId;
+    bar.classList.add('show');
+  }
+
+  // fill dept + sem info
+  document.getElementById('roleInfo').textContent =
+    'Department: ' + deptName + ' | Semester: ' + sem;
+})();
+
+/* ════════════════════════════════════════════
+   REVEAL ANIMATIONS — staggered
+════════════════════════════════════════════ */
+function initReveal(){
+  const btns = document.querySelectorAll('.role-btn');
+  btns.forEach((btn, i) => {
+    btn.style.transitionDelay = (i * 0.1) + 's';
+    setTimeout(() => btn.classList.add('visible'), 200 + i * 100);
+  });
+}
+
+/* ════════════════════════════════════════════
+   3D TILT — desktop hover
+════════════════════════════════════════════ */
+function init3DTilt(){
+  document.querySelectorAll('.role-btn').forEach(btn => {
+    btn.addEventListener('mousemove', e => {
+      const r  = btn.getBoundingClientRect();
+      const cx = r.width/2, cy = r.height/2;
+      const dx = e.clientX - r.left - cx;
+      const dy = e.clientY - r.top  - cy;
+      const rx = (dy/cy) * -7;
+      const ry = (dx/cx) *  7;
+      if(btn.classList.contains('visible')){
+        btn.style.transform =
+          `translateY(-6px) scale(1.04) rotateX(${rx}deg) rotateY(${ry}deg)`;
+      }
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.transform = '';
+    });
+    btn.addEventListener('touchstart', () => {
+      btn.style.transform = 'translateY(-4px) scale(1.03)';
+    },{passive:true});
+    btn.addEventListener('touchend', () => {
+      btn.style.transform = '';
+    },{passive:true});
+  });
+}
+
+/* ════════════════════════════════════════════
+   NAVIGATE
+════════════════════════════════════════════ */
+function goStudent(){
+  showToast('Opening feedback form...', 'info');
+  setTimeout(() => window.location.href = 'feedback.html', 400);
+}
+
+function goAdmin(){
+  showToast('Opening admin login...', 'info');
+  setTimeout(() => window.location.href = 'adminlogin.html', 400);
+}
+
+function goBack(){
+  window.location.href = 'auth.html';
+}
+
+/* ════════════════════════════════════════════
+   TOAST — 4 seconds
+════════════════════════════════════════════ */
+function showToast(msg, type='', duration=4000){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show' + (type ? ' '+type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.className = ''; }, 400);
+  }, duration);
+}
+
+/* ════════════════════════════════════════════
+   INIT
+════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  initReveal();
+  init3DTilt();
+});
+</script>
+</body>
+</html>

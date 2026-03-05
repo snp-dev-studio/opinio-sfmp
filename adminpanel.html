@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Admin Panel — OPINIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg-from:#a8e8f0;
+  --bg-to:#b8f0ee;
+  --white:#ffffff;
+  --teal:#009aaa;
+  --teal2:#00bcd4;
+  --green:#1db954;
+  --red:#e53935;
+  --purple:#8b34d9;
+  --blue:#1a6fa8;
+  --text-dark:#0d2a38;
+  --text-mid:#1e4a5e;
+  --text-light:#6a8a9a;
+  --card-bg:rgba(255,255,255,0.92);
+  --table-head:#00bcd4;
+  --radius:18px;
+  --radius-btn:50px;
+  --shadow:0 4px 20px rgba(0,80,110,0.12),0 1px 4px rgba(0,80,110,0.07);
+  --shadow-card:0 8px 32px rgba(0,80,110,0.14),0 2px 8px rgba(0,80,110,0.08);
+}
+html,body{
+  width:100%;min-height:100%;
+  font-family:'DM Sans',sans-serif;
+  background:linear-gradient(160deg,#a8e8f0 0%,#b2ecec 40%,#b8f0ee 70%,#aae8f0 100%);
+  overflow-x:hidden;
+}
+
+/* ═══════════════════════════════════════
+   ADMIN BAR (top)
+═══════════════════════════════════════ */
+.admin-bar{
+  width:100%;
+  background:rgba(255,255,255,0.72);
+  backdrop-filter:blur(12px);
+  padding:10px 16px;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.85rem;
+  color:#4a6a7a;
+  border-bottom:1px solid rgba(0,180,210,0.15);
+  position:sticky;top:0;z-index:100;
+}
+.admin-bar span{font-weight:700;color:#1a6fa8}
+
+/* ═══════════════════════════════════════
+   PAGE WRAP
+═══════════════════════════════════════ */
+.page-wrap{
+  max-width:860px;
+  margin:0 auto;
+  padding:16px 14px 60px;
+  display:flex;
+  flex-direction:column;
+  gap:16px;
+}
+
+/* ═══════════════════════════════════════
+   HEADER CARD
+═══════════════════════════════════════ */
+.header-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:24px 20px 20px;
+  box-shadow:var(--shadow-card);
+  border:1.5px solid rgba(255,255,255,0.8);
+  display:flex;
+  align-items:flex-start;
+  justify-content:space-between;
+  gap:12px;
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(24px)}
+  to{opacity:1;transform:translateY(0)}
+}
+.header-title{
+  font-family:'Syne',sans-serif;
+  font-size:clamp(1.4rem,5vw,1.75rem);
+  font-weight:800;
+  color:#1a6fa8;
+  line-height:1.2;
+  margin-bottom:6px;
+}
+.header-sub{
+  font-size:0.86rem;
+  color:var(--text-light);
+  font-weight:400;
+}
+.clipboard-icon{
+  font-size:1.3rem;
+  color:var(--text-light);
+  cursor:default;
+  flex-shrink:0;
+  margin-top:2px;
+}
+
+/* ═══════════════════════════════════════
+   BUTTONS SECTION
+═══════════════════════════════════════ */
+.btns-wrap{
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+  animation-delay:0.08s;
+}
+.btns-row{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+.btn{
+  flex:1;
+  min-width:140px;
+  padding:13px 16px;
+  border:none;
+  border-radius:var(--radius-btn);
+  font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;
+  font-weight:700;
+  cursor:pointer;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:8px;
+  position:relative;
+  overflow:hidden;
+  transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s ease;
+  white-space:nowrap;
+  letter-spacing:0.1px;
+}
+.btn::before{
+  content:'';position:absolute;top:0;left:-120%;
+  width:65%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+  transform:skewX(-20deg);transition:left 0.5s ease;
+}
+.btn:hover::before{left:140%}
+.btn:hover{transform:translateY(-2px) scale(1.02)}
+.btn:active{transform:scale(0.97)}
+
+/* button colour variants */
+.btn-red{
+  background:linear-gradient(135deg,#e53935,#c62828);color:#fff;
+  box-shadow:0 4px 16px rgba(229,57,53,0.32);
+}
+.btn-teal{
+  background:linear-gradient(135deg,#00acc1,#0097a7);color:#fff;
+  box-shadow:0 4px 16px rgba(0,172,193,0.32);
+}
+.btn-purple{
+  background:linear-gradient(135deg,#8b34d9,#6a1cb0);color:#fff;
+  box-shadow:0 4px 16px rgba(139,52,217,0.30);
+}
+.btn-teal2{
+  background:linear-gradient(135deg,#00bcd4,#00acc1);color:#fff;
+  box-shadow:0 4px 16px rgba(0,188,212,0.30);
+}
+.btn-green{
+  background:linear-gradient(135deg,#1db954,#15903e);color:#fff;
+  box-shadow:0 4px 16px rgba(29,185,84,0.30);
+  width:100%;flex:none;
+  font-size:0.9rem;
+  padding:14px;
+}
+.btn-blue{
+  background:linear-gradient(135deg,#1a6fa8,#1554a0);color:#fff;
+  box-shadow:0 4px 14px rgba(26,111,168,0.28);
+}
+
+/* total feedbacks count */
+.total-count{
+  font-family:'Syne',sans-serif;
+  font-size:0.95rem;
+  font-weight:700;
+  color:#1a6fa8;
+  text-align:center;
+  padding:4px 0;
+}
+
+/* ═══════════════════════════════════════
+   FEEDBACK BOXES CONTAINER
+═══════════════════════════════════════ */
+.feedbacks-container{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+.empty-msg{
+  text-align:center;
+  color:var(--text-light);
+  font-size:0.92rem;
+  padding:24px 0;
+  font-weight:400;
+}
+
+/* ── single student feedback card ── */
+.fb-card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  overflow:hidden;
+  box-shadow:var(--shadow-card);
+  border:1.5px solid rgba(255,255,255,0.78);
+  animation:cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  transition:transform 0.25s ease,box-shadow 0.25s ease;
+}
+.fb-card:hover{
+  transform:translateY(-2px);
+  box-shadow:0 14px 40px rgba(0,80,110,0.18);
+}
+
+/* card top bar: student info + delete btn */
+.fb-topbar{
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  padding:12px 14px;
+  gap:10px;
+  border-bottom:1px solid rgba(0,180,210,0.12);
+  flex-wrap:wrap;
+}
+.fb-student-info{
+  font-family:'DM Sans',sans-serif;
+  font-size:0.78rem;
+  color:var(--text-mid);
+  font-weight:500;
+  line-height:1.5;
+  flex:1;
+}
+.fb-student-info strong{
+  font-weight:700;
+  color:var(--text-dark);
+}
+.delete-btn{
+  background:linear-gradient(135deg,#e53935,#c62828);
+  color:#fff;border:none;
+  width:34px;height:34px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  cursor:pointer;font-size:0.85rem;flex-shrink:0;
+  box-shadow:0 2px 8px rgba(229,57,53,0.30);
+  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.25s;
+}
+.delete-btn:hover{transform:scale(1.12);box-shadow:0 4px 14px rgba(229,57,53,0.40)}
+.delete-btn:active{transform:scale(0.95)}
+
+/* ── table inside card ── */
+.fb-table-wrap{overflow-x:auto}
+.fb-table{
+  width:100%;
+  border-collapse:collapse;
+  font-size:0.78rem;
+  min-width:400px;
+}
+.fb-table thead tr{background:var(--table-head)}
+.fb-table thead th{
+  padding:9px 12px;
+  text-align:left;
+  color:#fff;
+  font-weight:700;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.78rem;
+  white-space:nowrap;
+}
+.fb-table tbody tr{border-bottom:1px solid rgba(0,180,210,0.1)}
+.fb-table tbody tr:last-child{border-bottom:none}
+.fb-table tbody tr:hover{background:rgba(0,188,212,0.04)}
+.fb-table td{
+  padding:8px 12px;
+  color:var(--text-mid);
+  vertical-align:top;
+  font-size:0.76rem;
+  line-height:1.5;
+}
+.fb-table td:first-child{font-weight:600;color:var(--text-dark);white-space:nowrap}
+.fb-table td:nth-child(2){white-space:nowrap}
+
+/* ═══════════════════════════════════════
+   BACK BUTTON
+═══════════════════════════════════════ */
+.back-wrap{
+  display:flex;justify-content:center;
+  padding-top:4px;
+}
+
+/* ═══════════════════════════════════════
+   CONFIRM MODAL
+═══════════════════════════════════════ */
+.modal-backdrop{
+  position:fixed;inset:0;
+  background:rgba(0,0,0,0.55);
+  z-index:2000;
+  display:none;align-items:center;justify-content:center;
+  padding:20px;
+}
+.modal-backdrop.show{display:flex;animation:bdIn 0.22s ease}
+@keyframes bdIn{from{opacity:0}to{opacity:1}}
+.modal-box{
+  background:#fff;
+  border-radius:18px;
+  padding:24px 22px 18px;
+  width:100%;max-width:380px;
+  box-shadow:0 16px 48px rgba(0,0,0,0.22);
+  animation:mboxIn 0.32s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes mboxIn{
+  from{transform:scale(0.88);opacity:0}
+  to{transform:scale(1);opacity:1}
+}
+.modal-header2{
+  display:flex;align-items:center;justify-content:space-between;
+  margin-bottom:12px;
+}
+.modal-title2{
+  font-family:'Syne',sans-serif;
+  font-size:1rem;font-weight:800;color:#1a1f36;
+}
+.modal-x{
+  background:none;border:none;cursor:pointer;
+  font-size:1.15rem;color:#8899aa;padding:2px;
+  border-radius:5px;transition:color 0.2s;
+}
+.modal-x:hover{color:#1a1f36}
+.modal-msg{
+  font-size:0.88rem;color:#4a6a7a;
+  margin-bottom:18px;line-height:1.5;
+}
+.modal-btns2{
+  display:flex;justify-content:flex-end;gap:10px;
+}
+.modal-no{
+  padding:9px 22px;border-radius:50px;
+  border:1.5px solid #dde8f0;background:#fff;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  color:#4a6a7a;cursor:pointer;
+  transition:background 0.2s;
+}
+.modal-no:hover{background:#f0f5f8}
+.modal-yes{
+  padding:9px 22px;border-radius:50px;
+  border:none;
+  background:linear-gradient(135deg,#e53935,#c62828);
+  color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;
+  cursor:pointer;
+  box-shadow:0 3px 10px rgba(229,57,53,0.30);
+  transition:transform 0.22s,box-shadow 0.22s;
+}
+.modal-yes:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(229,57,53,0.40)}
+
+/* ═══════════════════════════════════════
+   EXCEL CONFIRM MODAL (reuse same style)
+═══════════════════════════════════════ */
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:28px;left:50%;
+  transform:translateX(-50%) translateY(90px);
+  padding:13px 26px;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  z-index:99999;opacity:0;
+  transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;max-width:92vw;text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,0.22);pointer-events:none;
+  background:#1a2a4a;color:#fff;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{background:linear-gradient(135deg,#0d7a46,#0fa356)}
+#toast.error{background:linear-gradient(135deg,#b01a1a,#d42020)}
+#toast.info{background:linear-gradient(135deg,#0a6a7e,#00acc1)}
+#toast.warn{background:linear-gradient(135deg,#e65100,#f57c00)}
+
+/* responsive */
+@media(max-width:400px){
+  .btns-row{flex-direction:column}
+  .btn{min-width:unset;width:100%}
+}
+@media(min-width:600px){
+  .btns-row{flex-wrap:nowrap}
+}
+</style>
+</head>
+<body>
+
+<!-- Admin bar -->
+<div class="admin-bar">Admin: <span id="adminBarId">—</span></div>
+
+<!-- Confirm Delete All Modal -->
+<div class="modal-backdrop" id="deleteAllModal">
+  <div class="modal-box">
+    <div class="modal-header2">
+      <div class="modal-title2">Delete All Feedbacks</div>
+      <button class="modal-x" onclick="closeModal('deleteAllModal')">✕</button>
+    </div>
+    <div class="modal-msg">Are you sure you want to delete all student feedback data?</div>
+    <div class="modal-btns2">
+      <button class="modal-no" onclick="closeModal('deleteAllModal')">No</button>
+      <button class="modal-yes" onclick="confirmDeleteAll()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Delete Single Modal -->
+<div class="modal-backdrop" id="deleteSingleModal">
+  <div class="modal-box">
+    <div class="modal-header2">
+      <div class="modal-title2">Delete Feedback</div>
+      <button class="modal-x" onclick="closeModal('deleteSingleModal')">✕</button>
+    </div>
+    <div class="modal-msg">Are you sure you want to delete this student's feedback data?</div>
+    <div class="modal-btns2">
+      <button class="modal-no" onclick="closeModal('deleteSingleModal')">No</button>
+      <button class="modal-yes" onclick="confirmDeleteSingle()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Confirm Excel Modal -->
+<div class="modal-backdrop" id="excelModal">
+  <div class="modal-box">
+    <div class="modal-header2">
+      <div class="modal-title2">Download Excel Sheet</div>
+      <button class="modal-x" onclick="closeModal('excelModal')">✕</button>
+    </div>
+    <div class="modal-msg">Are you sure you want to download students feedback Excel data sheet?</div>
+    <div class="modal-btns2">
+      <button class="modal-no" onclick="closeModal('excelModal')">No</button>
+      <button class="modal-yes" style="background:linear-gradient(135deg,#1a6fa8,#1554a0);box-shadow:0 3px 10px rgba(26,111,168,0.30)" onclick="confirmExcel()">Yes</button>
+    </div>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast"></div>
+
+<div class="page-wrap">
+
+  <!-- Header Card -->
+  <div class="header-card">
+    <div class="header-text">
+      <div class="header-title">Admin Panel - Submitted Feedbacks</div>
+      <div class="header-sub">Manage all student feedback submissions</div>
+    </div>
+    <span class="clipboard-icon">📋</span>
+  </div>
+
+  <!-- Action Buttons -->
+  <div class="btns-wrap">
+    <!-- Row 1 -->
+    <div class="btns-row">
+      <button class="btn btn-red" onclick="openDeleteAll()">🗑️ RESET-[Delete all]</button>
+      <button class="btn btn-teal" onclick="goManage()">⚙️ Manage Subjects &amp; Faculties</button>
+    </div>
+    <!-- Row 2 -->
+    <div class="btns-row">
+      <button class="btn btn-purple" onclick="goUSNRange()">⚙️ Set USN Range or Limit</button>
+    </div>
+    <!-- Row 3 -->
+    <div class="btns-row">
+      <button class="btn btn-teal2" onclick="openExcelConfirm()">📋 Copy to Excel</button>
+      <button class="btn btn-teal2" onclick="downloadPDF()">📄 Download PDF</button>
+    </div>
+    <!-- Row 4 -->
+    <div class="btns-row">
+      <button class="btn btn-green" onclick="goResults()">📊 VIEW FEEDBACK RESULTS</button>
+    </div>
+    <!-- Total count -->
+    <div class="total-count" id="totalCount">Total Feedbacks Submitted: 0</div>
+  </div>
+
+  <!-- Feedbacks container -->
+  <div class="feedbacks-container" id="feedbacksContainer">
+    <div class="empty-msg" id="emptyMsg">No feedbacks submitted yet</div>
+  </div>
+
+  <!-- Back button -->
+  <div class="back-wrap">
+    <button class="btn btn-blue" style="width:auto;padding:12px 36px" onclick="goBack()">← Back</button>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, collection, getDocs, doc, deleteDoc, query, orderBy }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyA_mhiq57BO4DH7TIDtlzw3-kUfzRLm0k0",
+  authDomain:"opinio-e813a.firebaseapp.com",
+  projectId:"opinio-e813a",
+  storageBucket:"opinio-e813a.firebasestorage.app",
+  messagingSenderId:"553281150769",
+  appId:"1:553281150769:web:f7f154a9a4d23588c25a10"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* ── session ── */
+const loginId  = sessionStorage.getItem('opinio_loginId')  || '';
+const dept     = sessionStorage.getItem('opinio_dept')     || '';
+const sem      = sessionStorage.getItem('opinio_sem')      || '';
+const deptName = sessionStorage.getItem('opinio_deptName') || '';
+
+document.getElementById('adminBarId').textContent = loginId || '—';
+
+/* Firestore path for feedbacks */
+function feedbacksCol(){
+  return collection(db, `departments/${dept}/semesters/${sem}/accounts/${loginId}/feedbacks`);
+}
+function feedbackDoc(id){
+  return doc(db, `departments/${dept}/semesters/${sem}/accounts/${loginId}/feedbacks/${id}`);
+}
+
+/* ════════════════════════════════════════
+   ALL FEEDBACKS — stored globally
+════════════════════════════════════════ */
+let allFeedbacks = []; // [{id, data}]
+let deleteTargetId = null;
+
+/* ════════════════════════════════════════
+   LOAD FEEDBACKS
+════════════════════════════════════════ */
+async function loadFeedbacks(){
+  try {
+    const snap = await getDocs(feedbacksCol());
+    allFeedbacks = snap.docs.map(d => ({id: d.id, data: d.data()}));
+    // Sort by last 3 digits of USN ascending
+    allFeedbacks.sort((a,b) => {
+      const ua = parseInt((a.data.usn||'').slice(-3)) || 0;
+      const ub = parseInt((b.data.usn||'').slice(-3)) || 0;
+      return ua - ub;
+    });
+    renderFeedbacks();
+  } catch(e){
+    showToast('❌ Error loading feedbacks: '+e.message,'error');
+  }
+}
+
+/* ════════════════════════════════════════
+   RENDER FEEDBACKS
+════════════════════════════════════════ */
+function renderFeedbacks(){
+  const container = document.getElementById('feedbacksContainer');
+  const emptyMsg  = document.getElementById('emptyMsg');
+  const totalEl   = document.getElementById('totalCount');
+
+  totalEl.textContent = `Total Feedbacks Submitted: ${allFeedbacks.length}`;
+
+  if(!allFeedbacks.length){
+    container.innerHTML = '<div class="empty-msg">No feedbacks submitted yet</div>';
+    return;
+  }
+
+  container.innerHTML = allFeedbacks.map((fb,i) => {
+    const d = fb.data;
+    const subjects = d.subjects || [];
+    const rows = subjects.map(s => `
+      <tr>
+        <td>${escHtml(s.subjectName||'—')}</td>
+        <td>${escHtml(s.facultyName||'—')}</td>
+        <td>${formatRatings(s.ratings||{})}</td>
+        <td>${escHtml(s.comments||'—')}</td>
+      </tr>`).join('');
+
+    return `
+    <div class="fb-card" style="animation-delay:${i*0.04}s">
+      <div class="fb-topbar">
+        <div class="fb-student-info">
+          <strong>${escHtml(d.studentName||'—')}</strong> |
+          USN: ${escHtml(d.usn||'—')} |
+          Email: ${escHtml(d.email||'—')} |
+          Course: ${escHtml(d.course||deptName||'—')} |
+          Sem: ${escHtml(d.semester||sem||'—')} |
+          Section: ${escHtml(d.section||'—')}
+        </div>
+        <button class="delete-btn" onclick="askDeleteSingle('${fb.id}')" title="Delete">🗑️</button>
+      </div>
+      <div class="fb-table-wrap">
+        <table class="fb-table">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Faculty</th>
+              <th>Ratings</th>
+              <th>Comments</th>
+            </tr>
+          </thead>
+          <tbody>${rows || '<tr><td colspan="4" style="text-align:center;color:#aaa;padding:10px">No subject data</td></tr>'}</tbody>
+        </table>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function formatRatings(ratings){
+  if(!ratings || !Object.keys(ratings).length) return '—';
+  return Object.entries(ratings).map(([k,v]) => {
+    const text = ratingText(v);
+    return `${escHtml(k)}: ${v}/5 (${text})`;
+  }).join('<br>');
+}
+function ratingText(n){
+  if(n>=5) return 'Excellent';
+  if(n>=4) return 'Very Good';
+  if(n>=3) return 'Good';
+  if(n>=2) return 'Average';
+  return 'Poor';
+}
+function escHtml(s){
+  if(!s) return '';
+  return String(s).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+}
+
+/* ════════════════════════════════════════
+   DELETE ALL
+════════════════════════════════════════ */
+window.openDeleteAll = function(){ openModal('deleteAllModal'); };
+window.confirmDeleteAll = async function(){
+  closeModal('deleteAllModal');
+  try {
+    const dels = allFeedbacks.map(fb => deleteDoc(feedbackDoc(fb.id)));
+    await Promise.all(dels);
+    allFeedbacks = [];
+    renderFeedbacks();
+    showToast('✅ All feedbacks deleted','success');
+  } catch(e){ showToast('❌ Error: '+e.message,'error'); }
+};
+
+/* ════════════════════════════════════════
+   DELETE SINGLE
+════════════════════════════════════════ */
+window.askDeleteSingle = function(id){
+  deleteTargetId = id;
+  openModal('deleteSingleModal');
+};
+window.confirmDeleteSingle = async function(){
+  closeModal('deleteSingleModal');
+  if(!deleteTargetId) return;
+  try {
+    await deleteDoc(feedbackDoc(deleteTargetId));
+    allFeedbacks = allFeedbacks.filter(fb => fb.id !== deleteTargetId);
+    deleteTargetId = null;
+    renderFeedbacks();
+    showToast('✅ Feedback deleted','success');
+  } catch(e){ showToast('❌ Error: '+e.message,'error'); }
+};
+
+/* ════════════════════════════════════════
+   EXCEL EXPORT
+════════════════════════════════════════ */
+window.openExcelConfirm = function(){ openModal('excelModal'); };
+window.confirmExcel = function(){
+  closeModal('excelModal');
+  exportExcel();
+};
+function exportExcel(){
+  if(!allFeedbacks.length){ showToast('No feedbacks to export','warn'); return; }
+  let xml = `<?xml version="1.0"?><Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet" xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet"><Worksheet ss:Name="Feedbacks"><Table>`;
+
+  // header row
+  xml += row(['Student Name','USN','Email','Course','Semester','Section','Subject','Faculty','Ratings','Comments']);
+  xml += row([]); // blank
+
+  allFeedbacks.forEach(fb => {
+    const d = fb.data;
+    const subjects = d.subjects || [];
+    if(!subjects.length){
+      xml += row([d.studentName,d.usn,d.email,d.course||deptName,d.semester||sem,d.section,'—','—','—','—']);
+    } else {
+      subjects.forEach((s,i) => {
+        if(i===0){
+          xml += row([d.studentName,d.usn,d.email,d.course||deptName,d.semester||sem,d.section,
+            s.subjectName,s.facultyName,formatRatingsText(s.ratings||{}),s.comments||'—']);
+        } else {
+          xml += row(['','','','','','',s.subjectName,s.facultyName,formatRatingsText(s.ratings||{}),s.comments||'—']);
+        }
+      });
+    }
+    xml += row([]); // blank line after each student
+  });
+
+  xml += `</Table></Worksheet></Workbook>`;
+  const blob = new Blob([xml],{type:'application/vnd.ms-excel'});
+  const url  = URL.createObjectURL(blob);
+  const a    = document.createElement('a');
+  a.href=url; a.download=`OPINIO_Feedbacks_${dept}_Sem${sem}.xls`; a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Excel downloaded','success');
+}
+function row(cells){
+  if(!cells.length) return '<Row/>';
+  return '<Row>'+cells.map(c=>`<Cell><Data ss:Type="String">${String(c||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;')}</Data></Cell>`).join('')+'</Row>';
+}
+function formatRatingsText(ratings){
+  if(!ratings||!Object.keys(ratings).length) return '—';
+  return Object.entries(ratings).map(([k,v])=>`${k}: ${v}/5 (${ratingText(v)})`).join(' | ');
+}
+
+/* ════════════════════════════════════════
+   PDF DOWNLOAD
+════════════════════════════════════════ */
+window.downloadPDF = function(){
+  if(!allFeedbacks.length){ showToast('No feedbacks to export','warn'); return; }
+
+  let rows = '';
+  allFeedbacks.forEach(fb => {
+    const d = fb.data;
+    const subjects = d.subjects || [];
+    rows += `
+    <div class="student-block">
+      <div class="student-header">
+        <strong>${d.studentName||'—'}</strong> | USN: ${d.usn||'—'} |
+        Email: ${d.email||'—'} | Course: ${d.course||deptName||'—'} |
+        Sem: ${d.semester||sem||'—'} | Section: ${d.section||'—'}
+      </div>
+      <table>
+        <thead><tr><th>Subject</th><th>Faculty</th><th>Ratings</th><th>Comments</th></tr></thead>
+        <tbody>
+          ${subjects.map(s=>`<tr>
+            <td>${s.subjectName||'—'}</td>
+            <td>${s.facultyName||'—'}</td>
+            <td>${formatRatingsText(s.ratings||{})}</td>
+            <td>${s.comments||'—'}</td>
+          </tr>`).join('')||'<tr><td colspan="4">No data</td></tr>'}
+        </tbody>
+      </table>
+    </div>`;
+  });
+
+  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
+  <title>OPINIO Feedbacks</title>
+  <style>
+    body{font-family:'DM Sans',sans-serif;font-size:11px;color:#1a1f36;padding:20px}
+    h1{font-size:16px;color:#1a6fa8;margin-bottom:4px}
+    .meta{font-size:10px;color:#6a8a9a;margin-bottom:16px}
+    .student-block{margin-bottom:18px;border:1px solid #e0eaf0;border-radius:8px;overflow:hidden}
+    .student-header{background:#f0f7fb;padding:8px 12px;font-size:10px;color:#2d4a5e;border-bottom:1px solid #e0eaf0}
+    table{width:100%;border-collapse:collapse;font-size:10px}
+    th{background:#00bcd4;color:#fff;padding:7px 10px;text-align:left}
+    td{padding:6px 10px;border-bottom:1px solid #f0f5f8;color:#2d4a5e}
+    tr:last-child td{border-bottom:none}
+  </style>
+  </head><body>
+  <h1>OPINIO — Admin Panel: Submitted Feedbacks</h1>
+  <div class="meta">Department: ${deptName||dept} | Semester: ${sem} | Login ID: ${loginId} | Total: ${allFeedbacks.length}</div>
+  ${rows}
+  </body></html>`;
+
+  const win = window.open('','_blank','width=900,height=700');
+  if(!win){ showToast('⚠️ Allow popups to download PDF','warn'); return; }
+  win.document.write(html);
+  win.document.close();
+  win.focus();
+  setTimeout(() => { win.print(); }, 600);
+  showToast('✅ PDF ready — Save as PDF in print dialog','success',5000);
+};
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+window.goManage  = () => window.location.href = 'manage.html';
+window.goUSNRange= () => window.location.href = 'usnrange.html';
+window.goResults = () => window.location.href = 'results.html';
+window.goBack    = () => window.location.href = 'adminlogin.html';
+
+/* ════════════════════════════════════════
+   MODAL HELPERS
+════════════════════════════════════════ */
+window.openModal = function(id){
+  document.getElementById(id).classList.add('show');
+};
+window.closeModal = function(id){
+  document.getElementById(id).classList.remove('show');
+};
+// close on backdrop click
+document.querySelectorAll('.modal-backdrop').forEach(bd => {
+  bd.addEventListener('click', e => {
+    if(e.target === bd) bd.classList.remove('show');
+  });
+});
+
+/* ════════════════════════════════════════
+   TOAST — 4 seconds
+════════════════════════════════════════ */
+window.showToast = function(msg, type='', duration=4000){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show' + (type ? ' '+type : '');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(() => {
+    t.classList.remove('show');
+    setTimeout(() => { t.className=''; }, 400);
+  }, duration);
+};
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+loadFeedbacks();
+</script>
+</body>
+</html>

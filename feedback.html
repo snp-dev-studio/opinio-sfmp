@@ -1,0 +1,728 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0"/>
+<title>Feedback Form — OPINIO</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
+<style>
+/* ═══════════════════════════════════════
+   RESET & ROOT
+═══════════════════════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --bg:linear-gradient(160deg,#a8e8f0 0%,#b2ecec 40%,#b8f0ee 70%,#aae8f0 100%);
+  --card-bg:rgba(255,255,255,0.94);
+  --teal:#00acc1;--teal2:#00bcd4;
+  --blue:#1a6fa8;--blue2:#1554a0;
+  --red:#e53935;--green:#1db954;
+  --text-dark:#0d2a38;--text-mid:#1e4a5e;--text-muted:#7a9aaa;
+  --input-bg:#f0f8fb;--input-border:#d4ecf5;--input-focus:#00bcd4;
+  --label-color:#1a1f36;
+  --shadow:0 6px 24px rgba(0,80,110,0.12),0 2px 7px rgba(0,80,110,0.07);
+  --radius:18px;--radius-sm:12px;--radius-btn:50px;
+}
+html,body{width:100%;min-height:100%;font-family:'DM Sans',sans-serif;background:var(--bg);overflow-x:hidden}
+
+/* ═══════════════════════════════════════
+   TOP BAR
+═══════════════════════════════════════ */
+.top-bar{
+  width:100%;background:rgba(255,255,255,0.80);backdrop-filter:blur(14px);
+  padding:10px 16px;display:flex;align-items:center;justify-content:space-between;
+  border-bottom:1px solid rgba(0,180,210,0.15);position:sticky;top:0;z-index:200;gap:10px;
+}
+.top-login{font-size:0.84rem;color:#4a6a7a;font-weight:400}
+.top-login span{font-weight:700;color:var(--teal)}
+.signout-btn{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:8px 16px;background:#fff;
+  border:1.5px solid #e0eaf0;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:700;
+  color:var(--text-dark);cursor:pointer;white-space:nowrap;
+  transition:background 0.2s,transform 0.2s,box-shadow 0.2s;
+  box-shadow:0 2px 8px rgba(0,0,0,0.06);
+}
+.signout-btn:hover{background:#f5f8fa;transform:translateY(-1px);box-shadow:0 4px 12px rgba(0,0,0,0.10)}
+.signout-btn:active{transform:scale(0.97)}
+
+/* ═══════════════════════════════════════
+   PAGE WRAP
+═══════════════════════════════════════ */
+.page-wrap{max-width:780px;margin:0 auto;padding:16px 12px 70px;display:flex;flex-direction:column;gap:14px}
+
+/* ═══════════════════════════════════════
+   BRAND HEADER CARD
+═══════════════════════════════════════ */
+.brand-card{
+  background:var(--card-bg);border-radius:var(--radius);padding:22px 20px 18px;
+  text-align:center;box-shadow:var(--shadow);border:1.5px solid rgba(255,255,255,0.88);
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes cardIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
+.brand-name{
+  font-family:'Syne',sans-serif;font-size:clamp(2rem,7vw,2.6rem);font-weight:800;
+  letter-spacing:-1px;background:linear-gradient(90deg,#0a5d8a,#1a8fc4,#00b4d8,#1a8fc4,#0a5d8a);
+  background-size:220% auto;-webkit-background-clip:text;-webkit-text-fill-color:transparent;
+  background-clip:text;animation:shine 3s linear infinite;margin-bottom:4px;
+}
+@keyframes shine{0%{background-position:0% center}100%{background-position:220% center}}
+.brand-form-title{
+  font-family:'Syne',sans-serif;font-size:clamp(1rem,4vw,1.25rem);font-weight:700;
+  color:var(--teal);margin-bottom:6px;display:flex;align-items:center;justify-content:center;gap:7px;
+}
+.brand-sub{font-size:0.86rem;color:var(--text-muted);line-height:1.5}
+
+/* ═══════════════════════════════════════
+   STUDENT INFO CARD
+═══════════════════════════════════════ */
+.info-card{
+  background:var(--card-bg);border-radius:var(--radius);padding:20px 18px;
+  box-shadow:var(--shadow);border:1.5px solid rgba(255,255,255,0.88);
+  display:flex;flex-direction:column;gap:0;
+  animation:cardIn 0.6s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.07s;
+}
+.info-grid{display:grid;grid-template-columns:1fr;gap:14px}
+@media(min-width:520px){.info-grid{grid-template-columns:1fr 1fr}}
+
+.field-group{display:flex;flex-direction:column;gap:5px}
+.field-label{
+  font-family:'DM Sans',sans-serif;font-size:0.87rem;font-weight:700;color:var(--label-color);
+}
+.field-input{
+  width:100%;background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:var(--radius-sm);padding:12px 14px;
+  font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:500;color:var(--text-dark);
+  outline:none;transition:border-color 0.2s,box-shadow 0.2s,background 0.2s;
+}
+.field-input::placeholder{color:#b0c8d5;font-weight:400}
+.field-input:focus{border-color:var(--input-focus);background:#fff;box-shadow:0 0 0 3px rgba(0,188,212,0.12)}
+.field-input.err{border-color:var(--red);box-shadow:0 0 0 3px rgba(229,57,53,0.10)}
+.field-input[readonly]{background:#eef5f8;color:#5a7a8a;cursor:default}
+.field-err{font-size:0.72rem;color:var(--red);display:none;font-weight:500}
+.field-err.show{display:block}
+
+/* ═══════════════════════════════════════
+   FACULTY FEEDBACK SECTION HEADING
+═══════════════════════════════════════ */
+.section-heading{
+  font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--teal);
+  text-align:center;display:flex;align-items:center;justify-content:center;gap:7px;
+  animation:cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.12s;
+}
+
+/* ═══════════════════════════════════════
+   SUBJECT/FACULTY BOXES GRID
+═══════════════════════════════════════ */
+.boxes-grid{display:grid;grid-template-columns:1fr;gap:12px}
+@media(min-width:540px){.boxes-grid{grid-template-columns:1fr 1fr}}
+
+/* single subject/faculty box */
+.sf-box{
+  background:var(--card-bg);border-radius:var(--radius);
+  padding:16px 14px 14px;box-shadow:var(--shadow);
+  border:1.5px solid rgba(255,255,255,0.88);
+  display:flex;flex-direction:column;gap:10px;
+  animation:cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;
+  transition:transform 0.22s ease,box-shadow 0.22s ease;
+}
+.sf-box:hover{transform:translateY(-2px);box-shadow:0 14px 40px rgba(0,80,110,0.16)}
+.sf-box-title{
+  font-family:'Syne',sans-serif;font-size:0.88rem;font-weight:800;color:var(--teal);
+}
+.sf-label{font-size:0.78rem;font-weight:700;color:var(--label-color);margin-bottom:3px}
+.sf-input{
+  width:100%;background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:9px;padding:9px 12px;
+  font-family:'DM Sans',sans-serif;font-size:0.82rem;font-weight:500;color:var(--text-dark);
+  outline:none;transition:border-color 0.2s,background 0.2s;
+}
+.sf-input::placeholder{color:#b0c8d5;font-weight:400}
+.sf-input:focus{border-color:var(--input-focus);background:#fff}
+.sf-input[readonly]{background:#eef5f8;color:#4a7a8a;cursor:default}
+
+/* Feedback Ratings label */
+.ratings-label{
+  font-size:0.78rem;font-weight:700;color:var(--teal);margin-bottom:2px;
+}
+/* star rating row */
+.rating-row{display:flex;flex-direction:column;gap:4px;margin-bottom:2px}
+.rating-param-name{font-size:0.72rem;color:var(--text-mid);font-weight:500}
+.stars{display:flex;gap:4px;flex-wrap:wrap}
+.star{
+  font-size:1.3rem;cursor:pointer;transition:transform 0.18s cubic-bezier(0.34,1.56,0.64,1);
+  line-height:1;color:#d0dde5;user-select:none;
+}
+.star.lit{color:#f5a623}
+.star:hover{transform:scale(1.22)}
+.rating-val{font-size:0.68rem;color:var(--text-muted);margin-left:4px;font-weight:500}
+
+.no-params{font-size:0.72rem;color:#b0c0cc;font-style:italic}
+
+/* comments textarea */
+.sf-textarea{
+  width:100%;min-height:58px;resize:vertical;
+  background:var(--input-bg);border:1.5px solid var(--input-border);
+  border-radius:9px;padding:9px 12px;
+  font-family:'DM Sans',sans-serif;font-size:0.82rem;color:var(--text-dark);
+  outline:none;transition:border-color 0.2s;
+}
+.sf-textarea::placeholder{color:#b0c8d5}
+.sf-textarea:focus{border-color:var(--input-focus);background:#fff}
+
+/* ═══════════════════════════════════════
+   BOTTOM BUTTONS
+═══════════════════════════════════════ */
+.bottom-bar{
+  display:flex;flex-direction:column;gap:10px;align-items:center;
+  animation:cardIn 0.5s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.18s;
+}
+.add-more-btn{
+  display:inline-flex;align-items:center;gap:7px;padding:10px 22px;
+  background:#fff;border:1.5px solid rgba(0,188,212,0.35);border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:700;color:var(--teal);
+  cursor:pointer;transition:background 0.2s,transform 0.22s,box-shadow 0.22s;
+  box-shadow:0 2px 10px rgba(0,188,212,0.14);
+}
+.add-more-btn:hover{background:#f0fafb;transform:translateY(-1px);box-shadow:0 6px 18px rgba(0,188,212,0.22)}
+
+.btn-row{display:flex;gap:10px;flex-wrap:wrap;justify-content:center}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:7px;
+  padding:12px 22px;border:none;border-radius:var(--radius-btn);
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:700;
+  cursor:pointer;position:relative;overflow:hidden;
+  transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s;
+  letter-spacing:0.1px;
+}
+.btn::before{
+  content:'';position:absolute;top:0;left:-120%;width:65%;height:100%;
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+  transform:skewX(-20deg);transition:left 0.5s ease;
+}
+.btn:hover::before{left:140%}
+.btn:hover{transform:translateY(-2px) scale(1.02)}
+.btn:active{transform:scale(0.97)}
+.btn-dark{background:#1a1f36;color:#fff;box-shadow:0 4px 14px rgba(10,20,60,0.22)}
+.btn-teal{background:linear-gradient(135deg,#1ab8cc,#00acc1);color:#fff;box-shadow:0 5px 18px rgba(0,172,193,0.34)}
+.btn-red {background:linear-gradient(135deg,#e53935,#c62828);color:#fff;box-shadow:0 5px 18px rgba(229,57,53,0.32)}
+.btn-teal:disabled,.btn-dark:disabled{opacity:0.65;cursor:not-allowed;transform:none}
+
+/* footer */
+.page-footer{text-align:center;font-size:0.72rem;color:#8aacbc;line-height:1.7;padding-top:4px}
+
+/* ═══════════════════════════════════════
+   ADD MORE BOXES MODAL
+═══════════════════════════════════════ */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,0.52);z-index:2000;
+  display:none;align-items:center;justify-content:center;padding:20px;
+}
+.modal-backdrop.show{display:flex;animation:bdIn 0.22s ease}
+@keyframes bdIn{from{opacity:0}to{opacity:1}}
+.modal-box{
+  background:#fff;border-radius:18px;padding:24px 22px 20px;
+  width:100%;max-width:360px;
+  box-shadow:0 16px 50px rgba(0,0,0,0.22);
+  animation:mboxIn 0.32s cubic-bezier(0.22,1,0.36,1) both;
+}
+@keyframes mboxIn{from{transform:scale(0.88);opacity:0}to{transform:scale(1);opacity:1}}
+.modal-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:18px}
+.modal-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;color:var(--text-dark)}
+.modal-x{background:none;border:none;cursor:pointer;font-size:1.1rem;color:#8899aa;padding:2px;border-radius:5px;transition:color 0.2s}
+.modal-x:hover{color:var(--text-dark)}
+.modal-field{margin-bottom:14px}
+.modal-label{font-size:0.82rem;font-weight:700;color:var(--text-dark);margin-bottom:6px;display:block}
+.modal-input{
+  width:100%;border:1.5px solid #dde8f0;border-radius:10px;
+  padding:11px 40px 11px 13px;font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;color:var(--text-dark);outline:none;background:#fff;
+  transition:border-color 0.2s;position:relative;
+}
+.modal-input:focus{border-color:var(--teal2)}
+.modal-input.err{border-color:var(--red)}
+.modal-input-wrap{position:relative;display:flex;align-items:center}
+.modal-eye{position:absolute;right:11px;background:none;border:none;cursor:pointer;color:#b0bec5;font-size:0.95rem;display:flex;align-items:center;transition:color 0.2s}
+.modal-eye:hover{color:#6b7a99}
+.modal-select{
+  width:100%;border:1.5px solid #dde8f0;border-radius:10px;
+  padding:11px 13px;font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;color:var(--text-dark);outline:none;background:#fff;
+  transition:border-color 0.2s;cursor:pointer;
+}
+.modal-select:focus{border-color:var(--teal2)}
+.modal-err{font-size:0.73rem;color:var(--red);margin-top:4px;display:none;font-weight:500}
+.modal-err.show{display:block}
+.modal-btns{display:flex;justify-content:flex-end;gap:10px;margin-top:6px}
+.modal-cancel{
+  padding:9px 20px;border-radius:50px;border:1.5px solid #dde8f0;
+  background:#fff;font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:600;
+  color:#4a6a7a;cursor:pointer;transition:background 0.2s;
+}
+.modal-cancel:hover{background:#f5f8fa}
+.modal-ok{
+  padding:9px 22px;border-radius:50px;border:none;
+  background:linear-gradient(135deg,#1a6fa8,#1554a0);color:#fff;
+  font-family:'DM Sans',sans-serif;font-size:0.86rem;font-weight:700;
+  cursor:pointer;box-shadow:0 3px 10px rgba(26,84,160,0.28);
+  transition:transform 0.22s,box-shadow 0.22s;
+}
+.modal-ok:hover{transform:translateY(-1px);box-shadow:0 5px 14px rgba(26,84,160,0.38)}
+
+/* ═══════════════════════════════════════
+   TOAST
+═══════════════════════════════════════ */
+#toast{
+  position:fixed;bottom:28px;left:50%;transform:translateX(-50%) translateY(90px);
+  padding:13px 26px;border-radius:50px;
+  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  z-index:9999;opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
+  white-space:nowrap;max-width:92vw;text-align:center;
+  box-shadow:0 8px 30px rgba(0,0,0,0.22);pointer-events:none;background:#1a2a4a;color:#fff;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{background:linear-gradient(135deg,#0d7a46,#0fa356)}
+#toast.error{background:linear-gradient(135deg,#b01a1a,#d42020)}
+#toast.info{background:linear-gradient(135deg,#0a6a7e,#00acc1)}
+</style>
+</head>
+<body>
+
+<!-- Top bar -->
+<div class="top-bar">
+  <div class="top-login">Logged in as: <span id="topLoginId">—</span></div>
+  <button class="signout-btn" onclick="doSignOut()">↪ Sign Out</button>
+</div>
+
+<!-- Add More Modal -->
+<div class="modal-backdrop" id="addModal">
+  <div class="modal-box">
+    <div class="modal-header">
+      <div class="modal-title">Add More Subject/Faculty Boxes</div>
+      <button class="modal-x" onclick="closeAddModal()">✕</button>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">Admin Password:</label>
+      <div class="modal-input-wrap">
+        <input class="modal-input" id="modalAdminPwd" type="password" placeholder="Enter admin password"/>
+        <button class="modal-eye" onclick="toggleModalEye()" tabindex="-1"><span id="modalEyeIcon">👁️</span></button>
+      </div>
+      <div class="modal-err" id="modalPwdErr">Incorrect admin password</div>
+    </div>
+    <div class="modal-field">
+      <label class="modal-label">How many boxes to add:</label>
+      <select class="modal-select" id="modalBoxCount">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+      </select>
+    </div>
+    <div class="modal-btns">
+      <button class="modal-cancel" onclick="closeAddModal()">Cancel</button>
+      <button class="modal-ok" onclick="confirmAddBoxes()">OK</button>
+    </div>
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<div class="page-wrap">
+
+  <!-- Brand header -->
+  <div class="brand-card">
+    <div class="brand-name">OPINIO</div>
+    <div class="brand-form-title">Feedback Form 📋</div>
+    <div class="brand-sub">Your feedback helps to improve teaching quality ✏️ 💯</div>
+  </div>
+
+  <!-- Student Info -->
+  <div class="info-card">
+    <div class="info-grid">
+      <div class="field-group">
+        <label class="field-label">Student Name:</label>
+        <input class="field-input" id="studentName" type="text" placeholder="Enter your name..."/>
+        <div class="field-err" id="nameErr">Please enter your name</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Student Email ID:</label>
+        <input class="field-input" id="studentEmail" type="email" placeholder="Enter your Email id..."/>
+        <div class="field-err" id="emailErr">Please enter a valid email</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Student USN:</label>
+        <input class="field-input" id="studentUSN" type="text" placeholder="Enter 10-character USN (last 3 must be numbers)..." maxlength="10"/>
+        <div class="field-err" id="usnErr">USN must be 10 chars, last 3 digits as numbers</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Semester:</label>
+        <input class="field-input" id="studentSem" type="text" readonly/>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Section:</label>
+        <input class="field-input" id="studentSection" type="text" placeholder="Eg: LH01 / LH02 etc..."/>
+        <div class="field-err" id="sectionErr">Please enter your section</div>
+      </div>
+      <div class="field-group">
+        <label class="field-label">Course [Department Name]:</label>
+        <input class="field-input" id="studentCourse" type="text" readonly/>
+      </div>
+    </div>
+  </div>
+
+  <!-- Faculty Feedback heading -->
+  <div class="section-heading">Faculty Feedback Ratings ⭐</div>
+
+  <!-- Subject/Faculty boxes grid -->
+  <div class="boxes-grid" id="boxesGrid"></div>
+
+  <!-- Bottom bar -->
+  <div class="bottom-bar">
+    <button class="add-more-btn" onclick="openAddModal()">+ Add More Subject/Faculty</button>
+    <div class="btn-row">
+      <button class="btn btn-dark" onclick="goBack()">← Back</button>
+      <button class="btn btn-teal" id="submitBtn" onclick="submitFeedback()">Submit Feedback ✅</button>
+      <button class="btn btn-red" onclick="doSignOut()">↪ Sign Out</button>
+    </div>
+    <div class="page-footer" style="color: #000;">
+      OPINIO - Student Feedback Management Platform<br>
+      From SNP_DEV_Studio
+    </div>
+  </div>
+
+</div>
+
+<script type="module">
+import { initializeApp }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getFirestore, doc, getDoc, setDoc, collection }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = {
+  apiKey:"AIzaSyA_mhiq57BO4DH7TIDtlzw3-kUfzRLm0k0",
+  authDomain:"opinio-e813a.firebaseapp.com",
+  projectId:"opinio-e813a",
+  storageBucket:"opinio-e813a.firebasestorage.app",
+  messagingSenderId:"553281150769",
+  appId:"1:553281150769:web:f7f154a9a4d23588c25a10"
+};
+const app = initializeApp(firebaseConfig);
+const db  = getFirestore(app);
+
+/* ── session ── */
+const loginId  = sessionStorage.getItem('opinio_loginId')  || '';
+const dept     = sessionStorage.getItem('opinio_dept')     || '';
+const sem      = sessionStorage.getItem('opinio_sem')      || '';
+const deptName = sessionStorage.getItem('opinio_deptName') || '';
+const adminPwd = sessionStorage.getItem('opinio_adminPwd') || '';
+
+/* fill static fields */
+document.getElementById('topLoginId').textContent     = loginId || '—';
+document.getElementById('studentSem').value           = sem;
+document.getElementById('studentCourse').value        = deptName;
+
+/* Firestore refs */
+function sfRef(){
+  return doc(db,`departments/${dept}/semesters/${sem}/accounts/${loginId}/subjectFaculty/fields`);
+}
+function fbRef(usn){
+  return doc(db,`departments/${dept}/semesters/${sem}/accounts/${loginId}/feedbacks/${usn}`);
+}
+function usnRangeRef(){
+  return doc(db,`departments/${dept}/semesters/${sem}/accounts/${loginId}/usnRange/ranges`);
+}
+
+/* state */
+let adminFields   = { subjects:[], faculties:[], ratings:[] };
+let usnRanges     = [];
+let boxCount      = 0;
+
+/* ════════════════════════════════════════
+   LOAD ADMIN FIELDS & USN RANGES
+════════════════════════════════════════ */
+async function loadAdminData(){
+  try {
+    const sfSnap = await getDoc(sfRef());
+    if(sfSnap.exists()) adminFields = sfSnap.data();
+  } catch(e){ console.warn('Fields load:', e.message); }
+
+  try {
+    const urSnap = await getDoc(usnRangeRef());
+    if(urSnap.exists()) usnRanges = urSnap.data().ranges || [];
+  } catch(e){ console.warn('USN range load:', e.message); }
+
+  /* build initial boxes = number of subjects set by admin (min 1) */
+  const initialCount = Math.max(adminFields.subjects?.length || 0, 1);
+  for(let i = 0; i < initialCount; i++) addBox(i);
+}
+
+/* ════════════════════════════════════════
+   ADD A SUBJECT/FACULTY BOX
+════════════════════════════════════════ */
+function addBox(idx){
+  boxCount++;
+  const n        = boxCount;
+  const subjects  = adminFields.subjects  || [];
+  const faculties = adminFields.faculties || [];
+  const ratings   = adminFields.ratings   || [];
+
+  const subjectVal  = subjects[idx]  || '';
+  const facultyVal  = faculties[idx] || '';
+
+  const ratingHTML = ratings.length
+    ? ratings.map((param, pi) => `
+        <div class="rating-row" id="box${n}_rrow${pi}">
+          <div class="rating-param-name">${escHtml(param)}</div>
+          <div style="display:flex;align-items:center;gap:4px">
+            <div class="stars" data-box="${n}" data-param="${pi}" data-val="0">
+              ${[1,2,3,4,5].map(s =>
+                `<span class="star" data-v="${s}" onclick="setStar(${n},${pi},${s})">★</span>`
+              ).join('')}
+            </div>
+            <span class="rating-val" id="box${n}_rv${pi}">0/5</span>
+          </div>
+        </div>`).join('')
+    : '<div class="no-params">No rating parameters set by admin</div>';
+
+  const box = document.createElement('div');
+  box.className = 'sf-box';
+  box.id = `sfbox_${n}`;
+  box.style.animationDelay = (boxCount * 0.04) + 's';
+  box.innerHTML = `
+    <div class="sf-box-title">Subject/Faculty Box ${n}</div>
+
+    <div>
+      <div class="sf-label">Subject Name:</div>
+      <input class="sf-input" id="box${n}_sub" type="text"
+             value="${escAttr(subjectVal)}" placeholder="Set by admin" readonly/>
+    </div>
+
+    <div>
+      <div class="sf-label">Faculty Name:</div>
+      <input class="sf-input" id="box${n}_fac" type="text"
+             value="${escAttr(facultyVal)}" placeholder="Set by admin" readonly/>
+    </div>
+
+    <div>
+      <div class="ratings-label">Feedback Ratings:</div>
+      ${ratingHTML}
+    </div>
+
+    <div>
+      <div class="sf-label">Additional Comments:</div>
+      <textarea class="sf-textarea" id="box${n}_cmt"
+                placeholder="Any additional feedback..."></textarea>
+    </div>`;
+
+  document.getElementById('boxesGrid').appendChild(box);
+}
+
+/* ════════════════════════════════════════
+   STAR RATING
+════════════════════════════════════════ */
+window.setStar = function(boxNum, paramIdx, val){
+  const starsEl = document.querySelector(`.stars[data-box="${boxNum}"][data-param="${paramIdx}"]`);
+  if(!starsEl) return;
+  starsEl.setAttribute('data-val', val);
+  starsEl.querySelectorAll('.star').forEach(s => {
+    s.classList.toggle('lit', parseInt(s.getAttribute('data-v')) <= val);
+  });
+  const rvEl = document.getElementById(`box${boxNum}_rv${paramIdx}`);
+  if(rvEl) rvEl.textContent = val + '/5';
+};
+
+/* ════════════════════════════════════════
+   ADD MORE MODAL
+════════════════════════════════════════ */
+window.openAddModal = function(){
+  document.getElementById('modalAdminPwd').value = '';
+  document.getElementById('modalPwdErr').classList.remove('show');
+  document.getElementById('modalAdminPwd').classList.remove('err');
+  document.getElementById('addModal').classList.add('show');
+  setTimeout(() => document.getElementById('modalAdminPwd').focus(), 100);
+};
+window.closeAddModal = function(){
+  document.getElementById('addModal').classList.remove('show');
+};
+window.toggleModalEye = function(){
+  const inp = document.getElementById('modalAdminPwd');
+  const eye = document.getElementById('modalEyeIcon');
+  if(inp.type==='password'){inp.type='text';eye.textContent='🙈';}
+  else{inp.type='password';eye.textContent='👁️';}
+};
+window.confirmAddBoxes = function(){
+  const entered = document.getElementById('modalAdminPwd').value;
+  const errEl   = document.getElementById('modalPwdErr');
+  errEl.classList.remove('show');
+  document.getElementById('modalAdminPwd').classList.remove('err');
+  if(entered !== adminPwd){
+    errEl.textContent = 'Incorrect admin password';
+    errEl.classList.add('show');
+    document.getElementById('modalAdminPwd').classList.add('err');
+    return;
+  }
+  const count = parseInt(document.getElementById('modalBoxCount').value) || 1;
+  for(let i = 0; i < count; i++) addBox(boxCount); // no pre-fill for extra boxes
+  closeAddModal();
+  showToast(`✅ ${count} box(es) added`,'success');
+  setTimeout(()=>document.getElementById('boxesGrid').lastElementChild
+    ?.scrollIntoView({behavior:'smooth',block:'nearest'}),100);
+};
+/* close on backdrop click */
+document.getElementById('addModal').addEventListener('click', e => {
+  if(e.target === document.getElementById('addModal')) closeAddModal();
+});
+
+/* ════════════════════════════════════════
+   VALIDATE & SUBMIT
+════════════════════════════════════════ */
+window.submitFeedback = async function(){
+  /* clear errors */
+  document.querySelectorAll('.field-err').forEach(e => e.classList.remove('show'));
+  document.querySelectorAll('.field-input').forEach(i => i.classList.remove('err'));
+  let valid = true;
+
+  const name    = document.getElementById('studentName').value.trim();
+  const email   = document.getElementById('studentEmail').value.trim();
+  const usn     = document.getElementById('studentUSN').value.trim().toUpperCase();
+  const section = document.getElementById('studentSection').value.trim();
+
+  if(!name){
+    showFieldErr('nameErr','Please enter your name');
+    document.getElementById('studentName').classList.add('err'); valid=false;
+  }
+  if(!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){
+    showFieldErr('emailErr','Please enter a valid email ID');
+    document.getElementById('studentEmail').classList.add('err'); valid=false;
+  }
+  if(usn.length !== 10 || !/^\d{3}$/.test(usn.slice(-3))){
+    showFieldErr('usnErr','USN must be exactly 10 characters, last 3 must be digits');
+    document.getElementById('studentUSN').classList.add('err'); valid=false;
+  }
+  if(!section){
+    showFieldErr('sectionErr','Please enter your section');
+    document.getElementById('studentSection').classList.add('err'); valid=false;
+  }
+  if(!valid){ showToast('⚠️ Please fix the errors above','error'); return; }
+
+  /* USN range check */
+  if(usnRanges.length){
+    const last3 = parseInt(usn.slice(-3));
+    const inRange = usnRanges.some(r => last3 >= r.startUSN && last3 <= r.endUSN);
+    if(!inRange){
+      showFieldErr('usnErr',`USN not in allowed range. Contact admin.`);
+      document.getElementById('studentUSN').classList.add('err');
+      showToast('❌ USN not in allowed range','error'); return;
+    }
+  }
+
+  /* duplicate check */
+  try {
+    const existing = await getDoc(fbRef(usn));
+    if(existing.exists()){
+      showFieldErr('usnErr','Feedback already submitted for this USN');
+      document.getElementById('studentUSN').classList.add('err');
+      showToast('❌ Feedback already submitted for this USN','error'); return;
+    }
+  } catch(e){ /* allow if check fails */ }
+
+  /* collect subjects data */
+  const subjects = [];
+  for(let i = 1; i <= boxCount; i++){
+    const subEl = document.getElementById(`box${i}_sub`);
+    const facEl = document.getElementById(`box${i}_fac`);
+    if(!subEl || !facEl) continue;
+    const subName = subEl.value.trim();
+    const facName = facEl.value.trim();
+    if(!subName && !facName) continue; // skip empty boxes
+
+    const ratings = {};
+    (adminFields.ratings || []).forEach((param, pi) => {
+      const starsEl = document.querySelector(`.stars[data-box="${i}"][data-param="${pi}"]`);
+      ratings[param] = starsEl ? parseInt(starsEl.getAttribute('data-val')) || 0 : 0;
+    });
+
+    const comments = document.getElementById(`box${i}_cmt`)?.value.trim() || '';
+    subjects.push({ subjectName: subName, facultyName: facName, ratings, comments });
+  }
+
+  if(!subjects.length){
+    showToast('⚠️ Fill at least one Subject/Faculty box','error'); return;
+  }
+
+  const btn = document.getElementById('submitBtn');
+  btn.disabled = true; btn.textContent = 'Submitting...';
+
+  try {
+    await setDoc(fbRef(usn), {
+      studentName: name,
+      email,
+      usn,
+      semester: sem,
+      section,
+      course: deptName,
+      dept,
+      loginId,
+      subjects,
+      submittedAt: new Date().toISOString()
+    });
+    showToast('✅ Feedback submitted successfully!','success',5000);
+    setTimeout(() => window.location.href = 'thankyou.html', 1600);
+  } catch(e){
+    showToast('❌ Error: ' + e.message,'error');
+  }
+  btn.disabled = false; btn.textContent = 'Submit Feedback ✅';
+};
+
+/* ════════════════════════════════════════
+   NAVIGATION
+════════════════════════════════════════ */
+window.goBack    = () => window.location.href = 'role.html';
+window.doSignOut = () => {
+  sessionStorage.clear();
+  showToast('Signed out','info');
+  setTimeout(() => window.location.href = 'auth.html', 900);
+};
+
+/* ════════════════════════════════════════
+   HELPERS
+════════════════════════════════════════ */
+function showFieldErr(id, msg){
+  const el = document.getElementById(id);
+  if(el){ el.textContent = msg; el.classList.add('show'); }
+}
+function escHtml(s){ return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;') }
+function escAttr(s){ return String(s||'').replace(/"/g,'&quot;').replace(/</g,'&lt;') }
+
+/* clear field error on input */
+document.addEventListener('input', e => {
+  if(e.target.classList.contains('field-input')){
+    e.target.classList.remove('err');
+    const errEl = document.getElementById(e.target.id + 'Err') ||
+                  document.getElementById(e.target.id.replace('student','').toLowerCase() + 'Err');
+    if(errEl) errEl.classList.remove('show');
+  }
+});
+
+/* ════════════════════════════════════════
+   TOAST — 4 seconds
+════════════════════════════════════════ */
+window.showToast = function(msg, type='', duration=4000){
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className   = 'show'+(type?' '+type:'');
+  clearTimeout(t._timer);
+  t._timer = setTimeout(()=>{
+    t.classList.remove('show');
+    setTimeout(()=>{ t.className=''; },400);
+  }, duration);
+};
+
+/* ════════════════════════════════════════
+   INIT
+════════════════════════════════════════ */
+loadAdminData();
+</script>
+</body>
+</html>
