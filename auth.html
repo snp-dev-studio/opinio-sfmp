@@ -37,6 +37,67 @@ html,body{
 }
 
 /* ═══════════════════════════════════════════════
+   VIDEO PRE-SCREEN OVERLAY
+═══════════════════════════════════════════════ */
+#video-prescreen {
+  position: fixed;
+  inset: 0;
+  z-index: 9000;
+  background: #000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+
+/* Blurred BG video — desktop only, fills sides */
+#video-bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  filter: blur(28px) brightness(0.45) saturate(1.4);
+  transform: scale(1.08);
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* Main portrait video — centered */
+#video-main {
+  position: relative;
+  z-index: 1;
+  height: 100vh;
+  width: auto;
+  max-width: 100vw;
+  object-fit: contain;
+  display: block;
+}
+
+/* On mobile: video fills full width, height auto */
+@media (max-width: 480px) {
+  #video-main {
+    width: 100vw;
+    height: 100vh;
+    object-fit: cover;
+  }
+  #video-bg {
+    display: none;
+  }
+}
+
+/* ═══════════════════════════════════════════════
+   SLIDE TRANSITION — VIDEO OUT / AUTH CARD IN
+═══════════════════════════════════════════════ */
+.slide-out-left {
+  animation: slideOutLeft 0.65s cubic-bezier(0.55,0,0.1,1) forwards !important;
+}
+@keyframes slideOutLeft {
+  from { transform: translateX(0); opacity:1; }
+  to   { transform: translateX(-100%); opacity:0.6; }
+}
+
+/* ═══════════════════════════════════════════════
    PAGE LAYOUT
 ═══════════════════════════════════════════════ */
 .page-wrap{
@@ -46,7 +107,10 @@ html,body{
   align-items:center;
   justify-content:center;
   padding:28px 16px 40px;
+  opacity: 0;
+  transition: opacity 0.5s ease;
 }
+.page-wrap.visible { opacity: 1; }
 
 /* ═══════════════════════════════════════════════
    MAIN AUTH CARD
@@ -74,7 +138,7 @@ html,body{
   margin-bottom:20px;
 }
 .brand-title{
-  font-family:'Syne',sans-serif;
+  font-family:'Palatino Linotype','Palatino','Book Antiqua',Palatino,serif;
   font-size:clamp(2rem,8vw,2.6rem);
   font-weight:800;
   letter-spacing:-1px;
@@ -178,22 +242,37 @@ html,body{
   box-shadow:0 0 0 3px rgba(229,57,53,0.10);
 }
 
-/* eye toggle */
+/* ── EYE TOGGLE — clean SVG professional ── */
 .eye-btn{
   position:absolute;
   right:13px;
   background:none;
   border:none;
   cursor:pointer;
-  color:#b0bec5;
-  font-size:1rem;
-  padding:4px;
+  padding:5px;
   display:flex;
   align-items:center;
-  transition:color 0.2s;
+  justify-content:center;
+  border-radius:50%;
+  transition:background 0.18s ease;
   line-height:1;
 }
-.eye-btn:hover{color:#6b7a99}
+.eye-btn:hover{ background:rgba(26,128,196,0.08); }
+.eye-btn svg{
+  width:18px;
+  height:18px;
+  stroke:#b0bec5;
+  fill:none;
+  stroke-width:1.7;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+  transition:stroke 0.18s ease;
+}
+.eye-btn:hover svg{ stroke:#6b7a99; }
+.eye-open{ display:block; }
+.eye-slash{ display:none; }
+.eye-btn.pwd-visible .eye-open{ display:none; }
+.eye-btn.pwd-visible .eye-slash{ display:block; }
 
 /* error text */
 .field-error{
@@ -287,7 +366,31 @@ html,body{
   color:#a0b0c5;
   line-height:1.6;
 }
-.auth-footer strong{color:#7a90a8;font-weight:600}
+.auth-footer .footer-dev{
+  color:#555;
+  font-size:0.74rem;
+}
+.auth-footer .footer-dev strong{
+  display:block;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.88rem;
+  font-weight:700;
+  color:#1a1f36;
+  margin-top:1px;
+}
+.auth-footer .footer-managed{
+  color:#777;
+  font-size:0.72rem;
+  margin-top:8px;
+}
+.auth-footer .footer-managed strong{
+  display:block;
+  font-family:'DM Sans',sans-serif;
+  font-size:0.84rem;
+  font-weight:700;
+  color:#2a2a2a;
+  margin-top:1px;
+}
 
 /* ═══════════════════════════════════════════════
    TOAST
@@ -323,7 +426,18 @@ html,body{
 </head>
 <body>
 
-<div class="page-wrap">
+<!-- ═══════════════════════════════════════════
+     VIDEO PRE-SCREEN
+════════════════════════════════════════════ -->
+<div id="video-prescreen">
+  <video id="video-bg" src="auth-video.mp4" muted playsinline preload="auto" aria-hidden="true"></video>
+  <video id="video-main" src="auth-video.mp4" muted playsinline preload="auto"></video>
+</div>
+
+<!-- ═══════════════════════════════════════════
+     MAIN AUTH PAGE
+════════════════════════════════════════════ -->
+<div class="page-wrap" id="mainPage">
   <div class="auth-card">
 
     <!-- Brand -->
@@ -361,8 +475,9 @@ html,body{
         <div class="input-wrap">
           <input class="field-input" id="si_password" type="password"
                  placeholder="Enter your password" autocomplete="current-password"/>
-          <button class="eye-btn" onclick="toggleEye('si_password','eye1')" tabindex="-1">
-            <span id="eye1">👁️</span>
+          <button class="eye-btn" id="eyeBtn1" onclick="toggleEye('si_password','eyeBtn1')" tabindex="-1" aria-label="Toggle password visibility">
+            <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-slash" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19C5 19 1 12 1 12a18.2 18.2 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
         </div>
         <div class="field-error" id="si_password_err">Please enter your password</div>
@@ -395,8 +510,9 @@ html,body{
         <div class="input-wrap">
           <input class="field-input" id="su_password" type="password"
                  placeholder="Create password (min 5 chars)" autocomplete="new-password"/>
-          <button class="eye-btn" onclick="toggleEye('su_password','eye2')" tabindex="-1">
-            <span id="eye2">👁️</span>
+          <button class="eye-btn" id="eyeBtn2" onclick="toggleEye('su_password','eyeBtn2')" tabindex="-1" aria-label="Toggle password visibility">
+            <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-slash" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19C5 19 1 12 1 12a18.2 18.2 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
         </div>
         <div class="field-error" id="su_password_err">Password must be at least 5 characters</div>
@@ -408,8 +524,9 @@ html,body{
         <div class="input-wrap">
           <input class="field-input" id="su_adminPwd" type="password"
                  placeholder="Create admin password (min 4 chars)" autocomplete="new-password"/>
-          <button class="eye-btn" onclick="toggleEye('su_adminPwd','eye3')" tabindex="-1">
-            <span id="eye3">👁️</span>
+          <button class="eye-btn" id="eyeBtn3" onclick="toggleEye('su_adminPwd','eyeBtn3')" tabindex="-1" aria-label="Toggle password visibility">
+            <svg class="eye-open" viewBox="0 0 24 24"><path d="M1 12S5 5 12 5s11 7 11 7-4 7-11 7S1 12 1 12z"/><circle cx="12" cy="12" r="3"/></svg>
+            <svg class="eye-slash" viewBox="0 0 24 24"><path d="M17.94 17.94A10.94 10.94 0 0 1 12 19C5 19 1 12 1 12a18.2 18.2 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
           </button>
         </div>
         <div class="field-error" id="su_adminPwd_err">Admin password must be at least 4 characters</div>
@@ -423,10 +540,17 @@ html,body{
 
     </div>
 
-    <!-- Divider + Footer -->
+    <!-- Divider + Footer — both lines as in shared image -->
     <div class="auth-divider"></div>
-    <div class="auth-footer" style="color: #000;">
-      <strong>Developed by Syed Numan Pasha</strong>
+    <div class="auth-footer">
+      <div class="footer-dev">
+        Developed by
+        <strong>Syed Numan Pasha</strong>
+      </div>
+      <div class="footer-managed">
+        Managed by
+        <strong>Shoaibuddin Madni (IQAC NIT)</strong>
+      </div>
     </div>
 
   </div>
@@ -434,6 +558,61 @@ html,body{
 
 <!-- Toast -->
 <div id="toast"></div>
+
+<script>
+/* ════════════════════════════════════════════
+   VIDEO PRE-SCREEN SEQUENCE
+════════════════════════════════════════════ */
+(function(){
+  const prescreen = document.getElementById('video-prescreen');
+  const mainPage  = document.getElementById('mainPage');
+  const videoMain = document.getElementById('video-main');
+  const videoBg   = document.getElementById('video-bg');
+
+  /* -- STEP 1: Play video -- */
+  videoMain.play();
+  videoBg.play();
+
+  /* -- STEP 2: On video end → slide video LEFT → show real auth card -- */
+  videoMain.addEventListener('ended', function() {
+    videoMain.pause();
+    videoBg.pause();
+
+    /* slide prescreen out to the left */
+    prescreen.classList.add('slide-out-left');
+
+    /* after slide finishes (0.65s) → remove prescreen, reveal auth card */
+    setTimeout(function() {
+      prescreen.style.display = 'none';
+      mainPage.classList.add('visible');
+    }, 660);
+  });
+
+  /* Fallback: if video can't play or load, skip after 8.5s */
+  setTimeout(function() {
+    if (prescreen.style.display !== 'none') {
+      prescreen.style.display = 'none';
+      mainPage.classList.add('visible');
+    }
+  }, 8500);
+
+})();
+
+/* ════════════════════════════════════════════
+   EYE TOGGLE — SVG professional
+════════════════════════════════════════════ */
+window.toggleEye = function(inputId, btnId) {
+  const inp = document.getElementById(inputId);
+  const btn = document.getElementById(btnId);
+  if (inp.type === 'password') {
+    inp.type = 'text';
+    btn.classList.add('pwd-visible');
+  } else {
+    inp.type = 'password';
+    btn.classList.remove('pwd-visible');
+  }
+};
+</script>
 
 <script type="module">
 import { initializeApp }    from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
@@ -469,21 +648,6 @@ window.switchTab = function(tab){
 };
 
 /* ════════════════════════════════════════════
-   EYE TOGGLE
-════════════════════════════════════════════ */
-window.toggleEye = function(inputId, eyeId){
-  const inp = document.getElementById(inputId);
-  const eye = document.getElementById(eyeId);
-  if(inp.type === 'password'){
-    inp.type = 'text';
-    eye.textContent = '🙈';
-  } else {
-    inp.type = 'password';
-    eye.textContent = '👁️';
-  }
-};
-
-/* ════════════════════════════════════════════
    SIGN IN
 ════════════════════════════════════════════ */
 window.doSignIn = async function(){
@@ -506,7 +670,6 @@ window.doSignIn = async function(){
   btn.disabled = true; btn.textContent = 'Signing in...';
 
   try {
-    // Firestore path: departments/{dept}/semesters/{sem}/accounts/{loginId}
     const accRef  = doc(db,`departments/${dept}/semesters/${sem}/accounts/${loginId}`);
     const accSnap = await getDoc(accRef);
 
@@ -521,7 +684,6 @@ window.doSignIn = async function(){
         showFieldError('si_password');
         showToast('❌ Incorrect password', 'error');
       } else {
-        // success — save session
         sessionStorage.setItem('opinio_loginId',   loginId);
         sessionStorage.setItem('opinio_adminPwd',  data.adminPassword);
         showToast('✅ Signed in successfully!', 'success');
@@ -571,7 +733,6 @@ window.doSignUp = async function(){
       showFieldError('su_loginId');
       showToast('❌ Login ID already taken', 'error');
     } else {
-      // create account
       await setDoc(accRef, {
         loginId,
         accountPassword: password,
@@ -579,7 +740,6 @@ window.doSignUp = async function(){
         dept, sem, deptName,
         createdAt: new Date().toISOString()
       });
-      // save session
       sessionStorage.setItem('opinio_loginId',  loginId);
       sessionStorage.setItem('opinio_adminPwd', adminPwd);
       showToast('✅ Account created successfully!', 'success');
