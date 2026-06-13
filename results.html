@@ -7,11 +7,9 @@
 <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=DM+Sans:opsz,wght@9..40,400;9..40,500;9..40,600;9..40,700&display=swap" rel="stylesheet"/>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.min.js"></script>
 <style>
-/* ═══════════════════════════════════════
-   RESET & ROOT
-═══════════════════════════════════════ */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
 :root{
+  --palatino:"Palatino Linotype","Book Antiqua",Palatino,Georgia,serif;
   --bg:linear-gradient(160deg,#a8e8f0 0%,#b2ecec 40%,#b8f0ee 70%,#aae8f0 100%);
   --card-bg:rgba(255,255,255,0.93);
   --teal:#00acc1;--teal2:#00bcd4;
@@ -20,194 +18,213 @@
   --green-soft:#e8f9ef;--green-border:#b2dfca;
   --red-soft:#ffeaea;--red-border:#f5bcbc;
   --text-dark:#0d2a38;--text-mid:#1e4a5e;--text-muted:#7a9aaa;
-  --shadow:0 8px 30px rgba(0,80,110,0.13),0 2px 8px rgba(0,80,110,0.07);
-  --radius:18px;--radius-btn:50px;
+  --shadow:0 8px 32px rgba(0,80,110,0.13),0 2px 8px rgba(0,80,110,0.07);
+  --shadow-hover:0 18px 50px rgba(0,80,110,0.2),0 4px 14px rgba(0,80,110,0.1);
+  --radius:20px;--radius-btn:50px;
 }
 html,body{
   width:100%;min-height:100%;
-  font-family:'DM Sans',sans-serif;
+  font-family:var(--palatino);
   background:var(--bg);
   overflow-x:hidden;
 }
 
-/* ═══════════════════════════════════════
-   PAGE WRAP
-═══════════════════════════════════════ */
+/* ─── Page wrap ─── */
 .page-wrap{
-  max-width:760px;
-  margin:0 auto;
-  padding:16px 14px 70px;
-  display:flex;flex-direction:column;gap:14px;
+  max-width:760px;margin:0 auto;
+  padding:18px 14px 72px;
+  display:flex;flex-direction:column;gap:16px;
 }
 
-/* ═══════════════════════════════════════
-   HEADER CARD
-═══════════════════════════════════════ */
+/* ─── Reveal animation ─── */
+@keyframes cardIn{
+  from{opacity:0;transform:translateY(28px) scale(0.97)}
+  to{opacity:1;transform:translateY(0) scale(1)}
+}
+@keyframes floatCard{
+  0%,100%{transform:translateY(0)}
+  50%{transform:translateY(-4px)}
+}
+
+/* ─── Generic card base ─── */
+.card{
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  box-shadow:var(--shadow);
+  border:1.5px solid rgba(255,255,255,0.9);
+  position:relative;overflow:hidden;
+  transition:transform 0.32s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.32s ease;
+}
+.card::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--teal),var(--blue),var(--teal2));
+  border-radius:var(--radius) var(--radius) 0 0;
+}
+.card:hover{
+  transform:translateY(-4px);
+  box-shadow:var(--shadow-hover);
+}
+
+/* ─── Header card ─── */
 .header-card{
-  background:var(--card-bg);border-radius:var(--radius);
-  padding:20px 20px 16px;text-align:center;
-  box-shadow:var(--shadow);border:1.5px solid rgba(255,255,255,0.88);
+  padding:22px 22px 18px;text-align:center;
   animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;
 }
-@keyframes cardIn{from{opacity:0;transform:translateY(22px)}to{opacity:1;transform:translateY(0)}}
 .header-title{
-  font-family:'Syne',sans-serif;
-  font-size:clamp(1.3rem,5vw,1.7rem);
+  font-family:var(--palatino);
+  font-size:clamp(1.35rem,5vw,1.75rem);
   font-weight:800;color:var(--blue);
   display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:5px;
 }
-.header-sub{font-size:0.84rem;color:var(--text-muted)}
+.header-sub{font-family:var(--palatino);font-size:0.86rem;color:var(--text-muted);font-style:italic;}
 
-/* ═══════════════════════════════════════
-   STATS ROW — 3 tiles
-═══════════════════════════════════════ */
+/* ─── Stats row ─── */
 .stats-row{
-  display:grid;grid-template-columns:repeat(3,1fr);gap:10px;
-  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.06s;
+  display:grid;grid-template-columns:repeat(3,1fr);gap:12px;
 }
 .stat-tile{
-  background:var(--card-bg);border-radius:var(--radius);
-  padding:16px 10px 12px;text-align:center;
-  box-shadow:var(--shadow);border:1.5px solid rgba(255,255,255,0.88);
-  transition:transform 0.25s cubic-bezier(0.34,1.56,0.64,1);
+  background:var(--card-bg);
+  border-radius:var(--radius);
+  padding:18px 10px 14px;text-align:center;
+  box-shadow:var(--shadow);
+  border:1.5px solid rgba(255,255,255,0.9);
+  position:relative;overflow:hidden;
+  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;
+  transition:transform 0.32s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.32s;
+  cursor:default;
 }
-.stat-tile:hover{transform:translateY(-3px)}
+.stat-tile::before{
+  content:'';position:absolute;top:0;left:0;right:0;height:3px;
+  background:linear-gradient(90deg,var(--teal),var(--teal2));
+}
+.stat-tile:hover{transform:translateY(-5px) scale(1.03);box-shadow:var(--shadow-hover);}
+.stat-tile:nth-child(1){animation-delay:0.06s}
+.stat-tile:nth-child(2){animation-delay:0.10s}
+.stat-tile:nth-child(3){animation-delay:0.14s}
 .stat-num{
-  font-family:'Syne',sans-serif;
-  font-size:clamp(1.5rem,5vw,2rem);
-  font-weight:800;color:var(--text-dark);line-height:1;margin-bottom:4px;
+  font-family:var(--palatino);
+  font-size:clamp(1.6rem,5vw,2.1rem);
+  font-weight:800;color:var(--text-dark);line-height:1;margin-bottom:5px;
 }
-.stat-label{font-size:0.72rem;color:var(--text-muted);font-weight:500}
+.stat-label{font-family:var(--palatino);font-size:0.72rem;color:var(--text-muted);font-weight:500;font-style:italic;}
 
-/* ═══════════════════════════════════════
-   HIGHLIGHT ROW — highest / lowest
-═══════════════════════════════════════ */
+/* ─── Highlight row ─── */
 .highlight-row{
-  display:grid;grid-template-columns:1fr 1fr;gap:10px;
-  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.10s;
+  display:grid;grid-template-columns:1fr 1fr;gap:12px;
+  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.16s;
 }
 .highlight-card{
-  border-radius:var(--radius);padding:13px 14px;
+  border-radius:var(--radius);padding:15px 16px;
   box-shadow:var(--shadow);border:1.5px solid;
+  transition:transform 0.32s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.32s;
+  position:relative;overflow:hidden;
 }
+.highlight-card:hover{transform:translateY(-4px);box-shadow:var(--shadow-hover);}
 .hl-green{background:var(--green-soft);border-color:var(--green-border)}
-.hl-red  {background:var(--red-soft);  border-color:var(--red-border)}
+.hl-red{background:var(--red-soft);border-color:var(--red-border)}
 .hl-title{
-  font-family:'Syne',sans-serif;font-size:0.82rem;font-weight:800;
-  display:flex;align-items:center;gap:5px;margin-bottom:6px;
+  font-family:var(--palatino);font-size:0.84rem;font-weight:800;
+  display:flex;align-items:center;gap:5px;margin-bottom:7px;
 }
 .hl-green .hl-title{color:#1a7a3c}
-.hl-red   .hl-title{color:#c0392b}
-.hl-item{font-size:0.76rem;color:var(--text-mid);font-weight:500;line-height:1.7}
+.hl-red .hl-title{color:#c0392b}
+.hl-item{font-family:var(--palatino);font-size:0.77rem;color:var(--text-mid);font-weight:500;line-height:1.75}
 .hl-dot{font-size:0.65rem;margin-right:3px}
 
-/* ═══════════════════════════════════════
-   DETAILED PERFORMANCE TABLE
-═══════════════════════════════════════ */
+/* ─── Table card ─── */
 .table-card{
-  background:var(--card-bg);border-radius:var(--radius);
-  padding:18px 16px 14px;
-  box-shadow:var(--shadow);border:1.5px solid rgba(255,255,255,0.88);
-  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.14s;
+  padding:20px 18px 16px;
+  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.20s;
 }
 .section-title{
-  font-family:'Syne',sans-serif;font-size:0.95rem;font-weight:800;
-  color:var(--text-dark);margin-bottom:12px;
+  font-family:var(--palatino);font-size:1rem;font-weight:800;
+  color:var(--text-dark);margin-bottom:14px;
   display:flex;align-items:center;gap:7px;
 }
-.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid rgba(0,180,210,0.12)}
+.table-wrap{overflow-x:auto;border-radius:12px;border:1px solid rgba(0,180,210,0.14)}
 .perf-table{
   width:100%;border-collapse:collapse;
-  font-size:0.76rem;min-width:460px;
+  font-family:var(--palatino);font-size:0.77rem;min-width:460px;
 }
-.perf-table thead tr{background:var(--teal2)}
+.perf-table thead tr{background:linear-gradient(90deg,var(--teal),var(--blue))}
 .perf-table thead th{
-  padding:9px 11px;text-align:left;color:#fff;
-  font-weight:700;font-size:0.75rem;white-space:nowrap;
+  padding:10px 12px;text-align:left;color:#fff;
+  font-family:var(--palatino);font-weight:700;font-size:0.76rem;white-space:nowrap;
 }
-.perf-table tbody tr{border-bottom:1px solid rgba(0,180,210,0.10)}
+.perf-table tbody tr{border-bottom:1px solid rgba(0,180,210,0.10);transition:background 0.2s;}
 .perf-table tbody tr:last-child{border-bottom:none}
-.perf-table tbody tr:hover{background:rgba(0,188,212,0.04)}
+.perf-table tbody tr:hover{background:rgba(0,188,212,0.06)!important}
 .perf-table td{
-  padding:9px 11px;color:var(--text-mid);
-  vertical-align:middle;line-height:1.5;font-size:0.75rem;
+  padding:10px 12px;color:var(--text-mid);
+  vertical-align:middle;line-height:1.55;
+  font-family:var(--palatino);font-size:0.76rem;
 }
 .perf-table td:first-child{font-weight:700;color:var(--text-dark);white-space:nowrap}
 .perf-table td:nth-child(2){white-space:nowrap}
-.avg-cell{font-family:'Syne',sans-serif;font-weight:800;font-size:0.9rem;color:var(--blue)}
-.pct-cell{font-weight:700;font-size:0.82rem;color:var(--teal)}
-/* row highlight */
+.avg-cell{font-family:var(--palatino);font-weight:800;font-size:0.92rem;color:var(--blue)}
+.pct-cell{font-family:var(--palatino);font-weight:700;font-size:0.84rem;color:var(--teal)}
 .row-best{background:rgba(29,185,84,0.07)!important}
 .row-worst{background:rgba(229,57,53,0.06)!important}
-.param-cell{font-size:0.71rem;color:#4a6a7a;line-height:1.6}
+.param-cell{font-family:var(--palatino);font-size:0.72rem;color:#4a6a7a;line-height:1.7;font-style:italic;}
 
-/* ═══════════════════════════════════════
-   BAR CHART CARD
-═══════════════════════════════════════ */
+/* ─── Chart card ─── */
 .chart-card{
-  background:var(--card-bg);border-radius:var(--radius);
-  padding:18px 16px 20px;
-  box-shadow:var(--shadow);border:1.5px solid rgba(255,255,255,0.88);
-  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.18s;
+  padding:20px 18px 22px;
+  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.24s;
 }
-.chart-wrap{position:relative;width:100%;height:240px;margin-top:10px}
+.chart-wrap{position:relative;width:100%;height:250px;margin-top:12px}
 
-/* ═══════════════════════════════════════
-   BUTTONS
-═══════════════════════════════════════ */
+/* ─── Buttons ─── */
 .action-row{
   display:flex;gap:12px;justify-content:center;flex-wrap:wrap;
-  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.22s;
+  animation:cardIn 0.55s cubic-bezier(0.22,1,0.36,1) both;animation-delay:0.28s;
 }
 .btn{
   display:inline-flex;align-items:center;justify-content:center;gap:8px;
-  padding:12px 24px;border:none;border-radius:var(--radius-btn);
-  font-family:'DM Sans',sans-serif;font-size:0.9rem;font-weight:700;
+  padding:13px 26px;border:none;border-radius:var(--radius-btn);
+  font-family:var(--palatino);font-size:0.92rem;font-weight:700;
   cursor:pointer;position:relative;overflow:hidden;
   transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.28s;
-  letter-spacing:0.1px;
+  letter-spacing:0.1px;font-style:italic;
 }
 .btn::before{
   content:'';position:absolute;top:0;left:-120%;width:65%;height:100%;
-  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.22),transparent);
+  background:linear-gradient(90deg,transparent,rgba(255,255,255,0.25),transparent);
   transform:skewX(-20deg);transition:left 0.5s ease;
 }
 .btn:hover::before{left:140%}
-.btn:hover{transform:translateY(-2px) scale(1.02)}
+.btn:hover{transform:translateY(-3px) scale(1.03)}
 .btn:active{transform:scale(0.97)}
 .btn-teal{
   background:linear-gradient(135deg,#1ab8cc,#00acc1);color:#fff;
-  box-shadow:0 5px 18px rgba(0,172,193,0.34);
+  box-shadow:0 6px 20px rgba(0,172,193,0.36);
 }
+.btn-teal:hover{box-shadow:0 12px 32px rgba(0,172,193,0.46);}
 .btn-blue{
   background:linear-gradient(135deg,#1a6fa8,#1554a0);color:#fff;
-  box-shadow:0 5px 18px rgba(26,111,168,0.30);
+  box-shadow:0 6px 20px rgba(26,111,168,0.32);
 }
+.btn-blue:hover{box-shadow:0 12px 32px rgba(26,111,168,0.42);}
 
-/* ═══════════════════════════════════════
-   LOADING / EMPTY
-═══════════════════════════════════════ */
+/* ─── Loading / empty ─── */
 .loading-msg,.empty-msg{
-  text-align:center;padding:30px 20px;
-  font-size:0.9rem;color:var(--text-muted);
+  text-align:center;padding:32px 20px;
+  font-family:var(--palatino);font-size:0.92rem;color:var(--text-muted);font-style:italic;
 }
 .spinner{
-  display:inline-block;width:28px;height:28px;
-  border:3px solid rgba(0,188,212,0.25);
+  display:inline-block;width:30px;height:30px;
+  border:3px solid rgba(0,188,212,0.22);
   border-top-color:var(--teal2);
-  border-radius:50%;animation:spin 0.7s linear infinite;
-  margin-bottom:10px;
+  border-radius:50%;animation:spin 0.7s linear infinite;margin-bottom:10px;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ═══════════════════════════════════════
-   TOAST
-═══════════════════════════════════════ */
+/* ─── Toast ─── */
 #toast{
   position:fixed;bottom:28px;left:50%;
   transform:translateX(-50%) translateY(90px);
   padding:13px 26px;border-radius:50px;
-  font-family:'DM Sans',sans-serif;font-size:0.88rem;font-weight:600;
+  font-family:var(--palatino);font-size:0.88rem;font-weight:600;font-style:italic;
   z-index:9999;opacity:0;transition:all 0.4s cubic-bezier(0.34,1.56,0.64,1);
   white-space:nowrap;max-width:92vw;text-align:center;
   box-shadow:0 8px 30px rgba(0,0,0,0.22);pointer-events:none;
@@ -223,8 +240,8 @@ html,body{
   .stats-row .stat-num{font-size:1.3rem}
 }
 @media(min-width:600px){
-  .page-wrap{padding:24px 20px 80px}
-  .chart-wrap{height:280px}
+  .page-wrap{padding:26px 22px 82px}
+  .chart-wrap{height:290px}
 }
 </style>
 </head>
@@ -232,22 +249,17 @@ html,body{
 
 <div class="page-wrap">
 
-  <!-- Header -->
-  <div class="header-card">
-    <div class="header-title">
-      Feedback Results <span>📊</span>
-    </div>
+  <div class="card header-card">
+    <div class="header-title">Feedback Results <span>📊</span></div>
     <div class="header-sub" id="headerSub">— · Semester —</div>
   </div>
 
-  <!-- Stats row -->
   <div class="stats-row" id="statsRow">
     <div class="stat-tile"><div class="stat-num" id="statTotal">—</div><div class="stat-label">Total Feedbacks</div></div>
     <div class="stat-tile"><div class="stat-num" id="statFaculties">—</div><div class="stat-label">Faculties</div></div>
     <div class="stat-tile"><div class="stat-num" id="statSubjects">—</div><div class="stat-label">Subjects</div></div>
   </div>
 
-  <!-- Highest / Lowest -->
   <div class="highlight-row" id="highlightRow" style="display:none">
     <div class="highlight-card hl-green">
       <div class="hl-title">🏆 Highest Rated</div>
@@ -259,23 +271,18 @@ html,body{
     </div>
   </div>
 
-  <!-- Detailed Performance Table -->
-  <div class="table-card">
+  <div class="card table-card">
     <div class="section-title">📋 Detailed Performance Table</div>
     <div id="tableArea">
       <div class="loading-msg"><div class="spinner"></div><br>Loading feedback data...</div>
     </div>
   </div>
 
-  <!-- Bar Chart -->
-  <div class="chart-card" id="chartCard" style="display:none">
+  <div class="card chart-card" id="chartCard" style="display:none">
     <div class="section-title">📈 Faculty Performance Chart (Top 10)</div>
-    <div class="chart-wrap">
-      <canvas id="perfChart"></canvas>
-    </div>
+    <div class="chart-wrap"><canvas id="perfChart"></canvas></div>
   </div>
 
-  <!-- Action Buttons -->
   <div class="action-row">
     <button class="btn btn-teal" onclick="downloadPDF()">📄 Download PDF Report</button>
     <button class="btn btn-blue" onclick="goBack()">← Back to Admin</button>
@@ -310,13 +317,9 @@ const deptName = sessionStorage.getItem('opinio_deptName') || dept;
 document.getElementById('headerSub').textContent = `${deptName} - Semester ${sem}`;
 
 let chartInstance = null;
-let computedRows  = []; // for PDF
+let computedRows  = [];
 
-/* ════════════════════════════════════════
-   LOAD & PROCESS FEEDBACKS
-════════════════════════════════════════ */
 async function loadResults(){
-  /* Guard: all three session keys must be non-empty to build a valid Firestore path */
   if(!dept || !sem || !loginId){
     document.getElementById('tableArea').innerHTML =
       '<div class="empty-msg">⚠️ Session expired or missing. Please go back and sign in again.</div>';
@@ -326,22 +329,17 @@ async function loadResults(){
     showToast('⚠️ Session missing — please sign in again', 'error');
     return;
   }
-
   try {
     const path = `departments/${dept}/semesters/${sem}/accounts/${loginId}/feedbacks`;
     const snap = await getDocs(collection(db, path));
     const feedbacks = snap.docs.map(d => d.data());
-
     document.getElementById('statTotal').textContent = feedbacks.length;
-
     if(!feedbacks.length){
-      document.getElementById('tableArea').innerHTML =
-        '<div class="empty-msg">No feedbacks submitted yet</div>';
+      document.getElementById('tableArea').innerHTML = '<div class="empty-msg">No feedbacks submitted yet</div>';
       document.getElementById('statFaculties').textContent = '0';
       document.getElementById('statSubjects').textContent  = '0';
       return;
     }
-
     processAndRender(feedbacks);
   } catch(e){
     document.getElementById('tableArea').innerHTML =
@@ -350,286 +348,145 @@ async function loadResults(){
   }
 }
 
-/* ════════════════════════════════════════
-   PROCESS — aggregate per faculty+subject
-════════════════════════════════════════ */
 function processAndRender(feedbacks){
-  // Map: "faculty|subject" → { faculty, subject, paramTotals:{}, paramCounts:{}, count }
   const map = {};
-
   feedbacks.forEach(fb => {
     const subjects = fb.subjects || [];
     subjects.forEach(s => {
       const key = `${s.facultyName||'—'}|${s.subjectName||'—'}`;
       if(!map[key]){
-        map[key] = {
-          faculty: s.facultyName || '—',
-          subject: s.subjectName || '—',
-          paramTotals: {}, paramCounts: {}, count: 0
-        };
+        map[key] = {faculty:s.facultyName||'—',subject:s.subjectName||'—',paramTotals:{},paramCounts:{},count:0};
       }
-      const entry = map[key];
-      entry.count++;
+      const entry = map[key]; entry.count++;
       const ratings = s.ratings || {};
-      Object.entries(ratings).forEach(([param, val]) => {
-        entry.paramTotals[param] = (entry.paramTotals[param] || 0) + Number(val);
-        entry.paramCounts[param] = (entry.paramCounts[param] || 0) + 1;
+      Object.entries(ratings).forEach(([param,val]) => {
+        entry.paramTotals[param] = (entry.paramTotals[param]||0) + Number(val);
+        entry.paramCounts[param] = (entry.paramCounts[param]||0) + 1;
       });
     });
   });
-
-  // Compute averages per row
   computedRows = Object.values(map).map(entry => {
     const paramAvgs = {};
-    let totalSum = 0, totalCount = 0;
+    let totalSum=0,totalCount=0;
     Object.keys(entry.paramTotals).forEach(p => {
-      const avg = entry.paramTotals[p] / entry.paramCounts[p];
-      paramAvgs[p] = avg;
-      totalSum   += avg;
-      totalCount++;
+      const avg = entry.paramTotals[p]/entry.paramCounts[p];
+      paramAvgs[p]=avg; totalSum+=avg; totalCount++;
     });
-    const overallAvg = totalCount ? totalSum / totalCount : 0;
-    const percentage = (overallAvg / 5 * 100).toFixed(1);
-    return { ...entry, paramAvgs, overallAvg, percentage };
+    const overallAvg = totalCount ? totalSum/totalCount : 0;
+    const percentage = (overallAvg/5*100).toFixed(1);
+    return {...entry,paramAvgs,overallAvg,percentage};
   });
-
-  // Sort by overallAvg descending
-  computedRows.sort((a, b) => b.overallAvg - a.overallAvg);
-
-  // Stats
-  const faculties = [...new Set(computedRows.map(r => r.faculty))];
-  const subjects  = [...new Set(computedRows.map(r => r.subject))];
+  computedRows.sort((a,b) => b.overallAvg - a.overallAvg);
+  const faculties = [...new Set(computedRows.map(r=>r.faculty))];
+  const subjects  = [...new Set(computedRows.map(r=>r.subject))];
   document.getElementById('statFaculties').textContent = faculties.length;
   document.getElementById('statSubjects').textContent  = subjects.length;
-
-  // Highlight best / worst
   if(computedRows.length){
-    const best  = computedRows[0];
-    const worst = computedRows[computedRows.length - 1];
+    const best=computedRows[0], worst=computedRows[computedRows.length-1];
     document.getElementById('hlBest').innerHTML =
       `<span class="hl-dot">•</span>${best.faculty} (${best.subject}) - ${best.overallAvg.toFixed(2)}/5 (${best.percentage}%)`;
     document.getElementById('hlWorst').innerHTML =
       `<span class="hl-dot">•</span>${worst.faculty} (${worst.subject}) - ${worst.overallAvg.toFixed(2)}/5 (${worst.percentage}%)`;
-    document.getElementById('highlightRow').style.display = 'grid';
+    document.getElementById('highlightRow').style.display='grid';
   }
-
   renderTable(computedRows);
-  renderChart(computedRows.slice(0, 10));
+  renderChart(computedRows.slice(0,10));
 }
 
-/* ════════════════════════════════════════
-   RENDER TABLE
-════════════════════════════════════════ */
 function renderTable(rows){
   if(!rows.length){
-    document.getElementById('tableArea').innerHTML =
-      '<div class="empty-msg">No data to display</div>';
+    document.getElementById('tableArea').innerHTML='<div class="empty-msg">No data to display</div>';
     return;
   }
-
-  const best  = rows[0].overallAvg;
-  const worst = rows[rows.length-1].overallAvg;
-
-  const bodyRows = rows.map((r, i) => {
-    const rowClass = r.overallAvg === best  ? 'row-best'  :
-                     r.overallAvg === worst ? 'row-worst' : '';
-    const paramLines = Object.entries(r.paramAvgs)
-      .map(([p, v]) => `${p}: ${v.toFixed(2)}/5`)
-      .join('<br>');
-    return `
-      <tr class="${rowClass}">
-        <td>${esc(r.faculty)}</td>
-        <td>${esc(r.subject)}</td>
-        <td class="param-cell">${paramLines || '—'}</td>
-        <td class="avg-cell">${r.overallAvg.toFixed(2)}</td>
-        <td class="pct-cell">${r.percentage}%</td>
-      </tr>`;
+  const best=rows[0].overallAvg, worst=rows[rows.length-1].overallAvg;
+  const bodyRows = rows.map((r,i) => {
+    const rowClass = r.overallAvg===best ? 'row-best' : r.overallAvg===worst ? 'row-worst' : '';
+    const paramLines = Object.entries(r.paramAvgs).map(([p,v])=>`${p}: ${v.toFixed(2)}/5`).join('<br>');
+    return `<tr class="${rowClass}">
+      <td>${esc(r.faculty)}</td>
+      <td>${esc(r.subject)}</td>
+      <td class="param-cell">${paramLines||'—'}</td>
+      <td class="avg-cell">${r.overallAvg.toFixed(2)}</td>
+      <td class="pct-cell">${r.percentage}%</td>
+    </tr>`;
   }).join('');
-
   document.getElementById('tableArea').innerHTML = `
     <div class="table-wrap">
       <table class="perf-table">
-        <thead>
-          <tr>
-            <th>Faculty</th>
-            <th>Subject</th>
-            <th>Parameter Ratings</th>
-            <th>Overall Avg (out of 5)</th>
-            <th>Percentage</th>
-          </tr>
-        </thead>
+        <thead><tr><th>Faculty</th><th>Subject</th><th>Parameter Ratings</th><th>Overall Avg (out of 5)</th><th>Percentage</th></tr></thead>
         <tbody>${bodyRows}</tbody>
       </table>
     </div>`;
 }
 
-/* ════════════════════════════════════════
-   RENDER CHART
-════════════════════════════════════════ */
 function renderChart(rows){
-  if(!rows.length) return;
-  document.getElementById('chartCard').style.display = 'block';
-
-  const labels = rows.map(r => r.faculty);
-  const data   = rows.map(r => parseFloat(r.overallAvg.toFixed(2)));
-
-  // colour gradient based on value
-  const colors = data.map(v =>
-    v >= 4   ? 'rgba(0,188,212,0.88)' :
-    v >= 3   ? 'rgba(0,172,193,0.82)' :
-               'rgba(0,151,170,0.75)'
-  );
-
-  if(chartInstance) chartInstance.destroy();
-
-  const ctx = document.getElementById('perfChart').getContext('2d');
-  chartInstance = new Chart(ctx, {
-    type: 'bar',
-    data: {
-      labels,
-      datasets:[{
-        label:'Overall Avg (out of 5)',
-        data,
-        backgroundColor: colors,
-        borderColor: colors.map(c => c.replace('0.88','1').replace('0.82','1').replace('0.75','1')),
-        borderWidth: 0,
-        borderRadius: 6,
-        borderSkipped: false,
-      }]
-    },
+  if(!rows.length)return;
+  document.getElementById('chartCard').style.display='block';
+  const labels=rows.map(r=>r.faculty);
+  const data=rows.map(r=>parseFloat(r.overallAvg.toFixed(2)));
+  const colors=data.map(v=>v>=4?'rgba(0,188,212,0.88)':v>=3?'rgba(0,172,193,0.82)':'rgba(0,151,170,0.75)');
+  if(chartInstance)chartInstance.destroy();
+  const ctx=document.getElementById('perfChart').getContext('2d');
+  chartInstance=new Chart(ctx,{
+    type:'bar',
+    data:{labels,datasets:[{label:'Overall Avg (out of 5)',data,backgroundColor:colors,borderColor:colors.map(c=>c.replace('0.88','1').replace('0.82','1').replace('0.75','1')),borderWidth:0,borderRadius:8,borderSkipped:false}]},
     options:{
-      responsive:true,
-      maintainAspectRatio:false,
+      responsive:true,maintainAspectRatio:false,
       plugins:{
         legend:{display:false},
-        tooltip:{
-          callbacks:{
-            label: ctx => ` ${ctx.parsed.y.toFixed(2)} / 5  (${(ctx.parsed.y/5*100).toFixed(1)}%)`
-          },
-          backgroundColor:'rgba(10,40,70,0.88)',
-          padding:10,
-          cornerRadius:10,
-          titleFont:{family:'Syne',weight:'700'},
-          bodyFont:{family:'DM Sans'}
-        }
+        tooltip:{callbacks:{label:ctx=>` ${ctx.parsed.y.toFixed(2)} / 5  (${(ctx.parsed.y/5*100).toFixed(1)}%)`},
+          backgroundColor:'rgba(10,40,70,0.88)',padding:10,cornerRadius:10,
+          titleFont:{family:'Palatino Linotype, Book Antiqua, Palatino, serif',weight:'700'},
+          bodyFont:{family:'Palatino Linotype, Book Antiqua, Palatino, serif'}}
       },
       scales:{
-        y:{
-          min:0,max:5,
-          ticks:{stepSize:1,color:'#7a9aaa',font:{family:'DM Sans',size:11}},
-          grid:{color:'rgba(0,180,210,0.12)'},
-          border:{display:false}
-        },
-        x:{
-          ticks:{color:'#4a6a7a',font:{family:'DM Sans',size:11},maxRotation:30},
-          grid:{display:false},
-          border:{display:false}
-        }
+        y:{min:0,max:5,ticks:{stepSize:1,color:'#7a9aaa',font:{family:'Palatino Linotype, Palatino, serif',size:11}},grid:{color:'rgba(0,180,210,0.12)'},border:{display:false}},
+        x:{ticks:{color:'#4a6a7a',font:{family:'Palatino Linotype, Palatino, serif',size:11},maxRotation:30},grid:{display:false},border:{display:false}}
       },
-      animation:{duration:800,easing:'easeOutQuart'}
+      animation:{duration:900,easing:'easeOutQuart'}
     }
   });
 }
 
-/* ════════════════════════════════════════
-   PDF DOWNLOAD
-════════════════════════════════════════ */
 window.downloadPDF = function(){
-  if(!computedRows.length){ showToast('No data to export','info'); return; }
-
-  const rowsHtml = computedRows.map((r, i) => {
-    const params = Object.entries(r.paramAvgs)
-      .map(([p,v]) => `${p}: ${v.toFixed(2)}/5`).join(' | ');
-    const rowBg = i === 0                         ? '#e8f9ef' :
-                  i === computedRows.length - 1   ? '#ffeaea' : '#fff';
-    return `<tr style="background:${rowBg}">
-      <td>${r.faculty}</td>
-      <td>${r.subject}</td>
-      <td>${params||'—'}</td>
-      <td style="font-weight:700;color:#1a6fa8">${r.overallAvg.toFixed(2)}</td>
-      <td style="font-weight:700;color:#00acc1">${r.percentage}%</td>
-    </tr>`;
+  if(!computedRows.length){showToast('No data to export','info');return;}
+  const rowsHtml=computedRows.map((r,i)=>{
+    const params=Object.entries(r.paramAvgs).map(([p,v])=>`${p}: ${v.toFixed(2)}/5`).join(' | ');
+    const rowBg=i===0?'#e8f9ef':i===computedRows.length-1?'#ffeaea':'#fff';
+    return `<tr style="background:${rowBg}"><td>${r.faculty}</td><td>${r.subject}</td><td>${params||'—'}</td><td style="font-weight:700;color:#1a6fa8">${r.overallAvg.toFixed(2)}</td><td style="font-weight:700;color:#00acc1">${r.percentage}%</td></tr>`;
   }).join('');
-
-  const best  = computedRows[0];
-  const worst = computedRows[computedRows.length-1];
-
-  const html = `<!DOCTYPE html><html><head><meta charset="UTF-8"/>
-  <title>OPINIO Feedback Results</title>
-  <style>
-    body{font-family:'DM Sans',sans-serif;font-size:11px;color:#1a1f36;padding:24px}
-    h1{font-size:18px;color:#1a6fa8;margin-bottom:3px}
-    .sub{font-size:10px;color:#7a9aaa;margin-bottom:16px}
-    .stats{display:flex;gap:16px;margin-bottom:14px}
-    .stat{background:#f0f7fb;border-radius:8px;padding:8px 14px;font-size:11px}
-    .stat b{display:block;font-size:16px;color:#0d2a38}
-    .highlight{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}
-    .hl{border-radius:8px;padding:8px 12px;font-size:10px}
-    .hl-g{background:#e8f9ef;border:1px solid #b2dfca;color:#1a7a3c}
-    .hl-r{background:#ffeaea;border:1px solid #f5bcbc;color:#c0392b}
-    h2{font-size:12px;color:#1e4a5e;margin:0 0 8px}
-    table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:14px}
-    th{background:#00bcd4;color:#fff;padding:7px 10px;text-align:left}
-    td{padding:6px 10px;border-bottom:1px solid #f0f5f8}
-    .footer{font-size:9px;color:#a0b0c0;border-top:1px solid #e0eaf0;padding-top:10px;margin-top:14px}
-  </style>
+  const best=computedRows[0],worst=computedRows[computedRows.length-1];
+  const html=`<!DOCTYPE html><html><head><meta charset="UTF-8"/><title>OPINIO Feedback Results</title>
+  <style>body{font-family:"Palatino Linotype",Palatino,serif;font-size:11px;color:#1a1f36;padding:24px}h1{font-size:18px;color:#1a6fa8;margin-bottom:3px}.sub{font-size:10px;color:#7a9aaa;margin-bottom:16px;font-style:italic}.stats{display:flex;gap:16px;margin-bottom:14px}.stat{background:#f0f7fb;border-radius:8px;padding:8px 14px;font-size:11px}.stat b{display:block;font-size:16px;color:#0d2a38}.highlight{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:14px}.hl{border-radius:8px;padding:8px 12px;font-size:10px}.hl-g{background:#e8f9ef;border:1px solid #b2dfca;color:#1a7a3c}.hl-r{background:#ffeaea;border:1px solid #f5bcbc;color:#c0392b}h2{font-size:12px;color:#1e4a5e;margin:0 0 8px}table{width:100%;border-collapse:collapse;font-size:10px;margin-bottom:14px}th{background:#00bcd4;color:#fff;padding:7px 10px;text-align:left}td{padding:6px 10px;border-bottom:1px solid #f0f5f8}.footer{font-size:9px;color:#a0b0c0;border-top:1px solid #e0eaf0;padding-top:10px;margin-top:14px;font-style:italic}</style>
   </head><body>
   <h1>OPINIO — Feedback Results Report</h1>
   <div class="sub">${deptName} · Semester ${sem} · Generated: ${new Date().toLocaleString()}</div>
-  <div class="stats">
-    <div class="stat"><b>${computedRows.length}</b>Faculty-Subject Pairs</div>
-    <div class="stat"><b>${[...new Set(computedRows.map(r=>r.faculty))].length}</b>Faculties</div>
-    <div class="stat"><b>${[...new Set(computedRows.map(r=>r.subject))].length}</b>Subjects</div>
-  </div>
-  <div class="highlight">
-    <div class="hl hl-g"><strong>🏆 Highest Rated:</strong><br>${best.faculty} (${best.subject}) — ${best.overallAvg.toFixed(2)}/5 (${best.percentage}%)</div>
-    <div class="hl hl-r"><strong>👎 Lowest Rated:</strong><br>${worst.faculty} (${worst.subject}) — ${worst.overallAvg.toFixed(2)}/5 (${worst.percentage}%)</div>
-  </div>
+  <div class="stats"><div class="stat"><b>${computedRows.length}</b>Faculty-Subject Pairs</div><div class="stat"><b>${[...new Set(computedRows.map(r=>r.faculty))].length}</b>Faculties</div><div class="stat"><b>${[...new Set(computedRows.map(r=>r.subject))].length}</b>Subjects</div></div>
+  <div class="highlight"><div class="hl hl-g"><strong>🏆 Highest Rated:</strong><br>${best.faculty} (${best.subject}) — ${best.overallAvg.toFixed(2)}/5 (${best.percentage}%)</div><div class="hl hl-r"><strong>👎 Lowest Rated:</strong><br>${worst.faculty} (${worst.subject}) — ${worst.overallAvg.toFixed(2)}/5 (${worst.percentage}%)</div></div>
   <h2>Detailed Performance Table</h2>
-  <table>
-    <thead><tr><th>Faculty</th><th>Subject</th><th>Parameter Ratings</th><th>Overall Avg</th><th>Percentage</th></tr></thead>
-    <tbody>${rowsHtml}</tbody>
-  </table>
+  <table><thead><tr><th>Faculty</th><th>Subject</th><th>Parameter Ratings</th><th>Overall Avg</th><th>Percentage</th></tr></thead><tbody>${rowsHtml}</tbody></table>
   <div class="footer">© OPINIO Feedback Management System · Developed by Syed Numan Pasha</div>
   </body></html>`;
-
-  const win = window.open('','_blank','width=900,height=700');
-  if(!win){ showToast('⚠️ Allow popups for PDF download','info'); return; }
-  win.document.write(html);
-  win.document.close();
-  win.focus();
-  setTimeout(() => win.print(), 600);
+  const win=window.open('','_blank','width=900,height=700');
+  if(!win){showToast('⚠️ Allow popups for PDF download','info');return;}
+  win.document.write(html);win.document.close();win.focus();
+  setTimeout(()=>win.print(),600);
   showToast('✅ PDF ready — Save as PDF in print dialog','success',5000);
 };
 
-/* ════════════════════════════════════════
-   HELPERS
-════════════════════════════════════════ */
 window.goBack = function(){ window.location.href = 'adminpanel.html'; };
 
 function esc(s){
-  return String(s||'')
-    .replace(/&/g,'&amp;').replace(/</g,'&lt;')
-    .replace(/>/g,'&gt;').replace(/"/g,'&quot;');
+  return String(s||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');
 }
 
-/* ════════════════════════════════════════
-   TOAST — 4 seconds
-════════════════════════════════════════ */
-window.showToast = function(msg, type='', duration=4000){
-  const t = document.getElementById('toast');
-  t.textContent = msg;
-  t.className   = 'show'+(type?' '+type:'');
+window.showToast = function(msg,type='',duration=4000){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show'+(type?' '+type:'');
   clearTimeout(t._timer);
-  t._timer = setTimeout(()=>{
-    t.classList.remove('show');
-    setTimeout(()=>{ t.className=''; },400);
-  }, duration);
+  t._timer=setTimeout(()=>{t.classList.remove('show');setTimeout(()=>{t.className='';},400);},duration);
 };
 
-/* ════════════════════════════════════════
-   INIT
-════════════════════════════════════════ */
 loadResults();
 </script>
 </body>
